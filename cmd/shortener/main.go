@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
-	"time"
 )
 
 var urlMap = make(map[string]string)
@@ -29,10 +28,6 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func shortenURLHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method POST", http.StatusMethodNotAllowed)
-		return
-	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
@@ -51,15 +46,7 @@ func shortenURLHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func redirectToOriginalURLHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method GET", http.StatusMethodNotAllowed)
-		return
-	}
-
 	shortID := r.URL.Path[1:]
-
-	fmt.Println(shortID)
 
 	originalURL, exists := urlMap[shortID]
 	if exists {
@@ -68,10 +55,6 @@ func redirectToOriginalURLHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "URL not found", http.StatusBadRequest)
 	}
-}
-
-func init() {
-	rand.NewSource(time.Now().UnixNano())
 }
 
 func randSeq(n int) string {
