@@ -3,7 +3,10 @@ package main
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handle)
-	http.ListenAndServe(":8080", mux)
+	err := http.ListenAndServe(":8080", mux)
+	if err != nil && err != http.ErrServerClosed {
+		return
+	}
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
