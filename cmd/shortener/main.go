@@ -14,7 +14,7 @@ var urlMap = make(map[string]string)
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handle)
-	//mux.HandleFunc("/", shortenURLHandler)
+	//mux.HandleFunc("/", shortenURLHandler),
 	//mux.HandleFunc("/{id}", redirectToOriginalURLHandler)
 	http.ListenAndServe(":8080", mux)
 }
