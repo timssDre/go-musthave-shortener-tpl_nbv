@@ -1,7 +1,16 @@
 package main
 
-func main() {
+import (
+	"fmt"
+	"io"
+	"math/rand"
+	"net/http"
+	"strings"
+)
 
+var urlMap = make(map[string]string)
+
+func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handle)
 	err := http.ListenAndServe(":8080", mux)
@@ -48,4 +57,11 @@ func redirectToOriginalURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func randSeq(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
