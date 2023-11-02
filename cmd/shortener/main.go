@@ -1,27 +1,27 @@
 package main
 
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"io"
+	"math/rand"
+	"net/http"
+	"strings"
+)
+
+var urlMap = make(map[string]string)
+
 func main() {
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", handle)
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		return
-	}
+	r := gin.Default()
+	r.POST("/", shortenURLHandler)
+	r.GET("/:id", redirectToOriginalURLHandler)
+	r.Run(":8080")
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		redirectToOriginalURLHandler(w, r)
-	} else if r.Method == http.MethodPost {
-		shortenURLHandler(w, r)
-	}
-}
-
-func shortenURLHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
+func shortenURLHandler(c *gin.Context) {
+	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
 	URLtoBody := strings.TrimSpace(string(body))
@@ -31,21 +31,27 @@ func shortenURLHandler(w http.ResponseWriter, r *http.Request) {
 
 	shortURL := fmt.Sprintf("http://localhost:8080/%s", shortID)
 
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprint(w, shortURL)
+	c.Header("Content-Type", "text/plain")
+	c.String(http.StatusCreated, shortURL)
 }
 
-func redirectToOriginalURLHandler(w http.ResponseWriter, r *http.Request) {
-	shortID := r.URL.Path[1:]
-
+func redirectToOriginalURLHandler(c *gin.Context) {
+	shortID := c.Param("id")
+	fmt.Println(shortID)
 	originalURL, exists := urlMap[shortID]
 	if exists {
-		w.Header().Set("Location", originalURL)
-		http.Redirect(w, r, originalURL, http.StatusTemporaryRedirect)
+		c.Header("Location", originalURL)
+		c.String(http.StatusTemporaryRedirect, originalURL)
 	} else {
-		http.Error(w, "URL not found", http.StatusBadRequest)
+		c.String(http.StatusTemporaryRedirect, "URL not found")
 	}
 }
 
+func randSeq(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
