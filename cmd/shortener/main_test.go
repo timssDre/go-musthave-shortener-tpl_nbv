@@ -47,7 +47,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 		argsGet argsGet
 	}{
 		{
-			name: "test2",
+			name: "test1",
 			argsGet: argsGet{
 				code:     307,
 				location: "https://practicum.yandex.ru/",
