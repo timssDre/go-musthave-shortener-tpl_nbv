@@ -14,7 +14,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handle)
 	err := http.ListenAndServe(":8080", mux)
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil {
 		return
 	}
 }
