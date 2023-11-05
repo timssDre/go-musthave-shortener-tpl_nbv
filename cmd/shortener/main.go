@@ -15,7 +15,10 @@ func main() {
 	r := gin.Default()
 	r.POST("/", shortenURLHandler)
 	r.GET("/:id", redirectToOriginalURLHandler)
-	r.Run(":8080")
+	err := r.Run(":8080")
+	if err != nil {
+		fmt.Println("failed to start the browser")
+	}
 }
 
 func shortenURLHandler(c *gin.Context) {
