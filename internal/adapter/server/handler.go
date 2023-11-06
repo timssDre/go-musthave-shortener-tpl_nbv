@@ -27,7 +27,6 @@ func (s *Server) shortenURLHandler(c *gin.Context) {
 
 func (s *Server) redirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
-	fmt.Println(shortID)
 	originalURL, exists := s.urlMap[shortID]
 	if exists {
 		c.Header("Location", originalURL)
