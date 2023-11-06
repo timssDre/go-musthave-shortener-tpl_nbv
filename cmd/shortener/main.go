@@ -24,32 +24,32 @@ func main() {
 	flag.Parse()
 
 	r1 := gin.Default()
-	//r2 := gin.Default()
+	r2 := gin.Default()
 	r1.POST("/", shortenURLHandler)
-	r1.GET("/:id", redirectToOriginalURLHandler)
+	r2.GET("/:id", redirectToOriginalURLHandler)
 
-	err := r1.Run(*addr)
-	if err != nil {
-		fmt.Println("failed to start the browser ROST")
-		panic(err)
-	}
+	//err := r1.Run(*addr)
+	//if err != nil {
+	//	fmt.Println("failed to start the browser ROST")
+	//	panic(err)
+	//}
 
-	//go func() {
-	//	err := r1.Run(*addr)
-	//	if err != nil {
-	//		fmt.Println("failed to start the browser ROST")
-	//		panic(err)
-	//	}
-	//}()
-	//go func() {
-	//	err := r2.Run(addrResPos)
-	//	if err != nil {
-	//		fmt.Println("failed to start the browser GET")
-	//		panic(err)
-	//	}
-	//}()
-	//
-	//select {}
+	go func() {
+		err := r1.Run(*addr)
+		if err != nil {
+			fmt.Println("failed to start the browser ROST")
+			panic(err)
+		}
+	}()
+	go func() {
+		err := r2.Run(addrResPos)
+		if err != nil {
+			fmt.Println("failed to start the browser GET")
+			panic(err)
+		}
+	}()
+
+	select {}
 }
 
 func shortenURLHandler(c *gin.Context) {
