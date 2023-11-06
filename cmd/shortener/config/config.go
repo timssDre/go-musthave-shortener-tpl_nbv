@@ -7,8 +7,8 @@ type AddrConfig struct {
 
 func InitConfig() *AddrConfig {
 	config := &AddrConfig{
-		ServerAddr: "localhost:8081",
-		BaseURL:    "http://localhost:8081",
+		ServerAddr: "localhost:8080",
+		BaseURL:    "http://localhost:8080",
 	}
 	return config
 }
