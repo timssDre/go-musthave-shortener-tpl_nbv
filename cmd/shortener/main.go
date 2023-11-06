@@ -31,12 +31,14 @@ func main() {
 		err := r1.Run(*addr)
 		if err != nil {
 			fmt.Println("failed to start the browser ROST")
+			panic(err)
 		}
 	}()
 	go func() {
 		err := r2.Run(addrResPos)
 		if err != nil {
 			fmt.Println("failed to start the browser GET")
+			panic(err)
 		}
 	}()
 
