@@ -46,7 +46,7 @@ func shortenURLHandler(c *gin.Context) {
 	shortID := randSeq(8)
 	urlMap[shortID] = URLtoBody
 
-	shortURL := fmt.Sprintf("http://%s/%s", addr, shortID)
+	shortURL := fmt.Sprintf("%s/%s", BaseUrl, shortID)
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
@@ -65,10 +65,6 @@ func redirectToOriginalURLHandler(c *gin.Context) {
 }
 
 func randSeq(n int) string {
-	if BaseUrl != "default" {
-		return BaseUrl
-	}
-
 	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, n)
 	for i := range b {
