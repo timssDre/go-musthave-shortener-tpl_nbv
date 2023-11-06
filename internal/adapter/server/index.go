@@ -21,6 +21,7 @@ func New(addr string, BaseURL string) *Server {
 }
 
 func (s *Server) Start() error {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.POST("/", s.shortenURLHandler)
 	r.GET("/:id", s.redirectToOriginalURLHandler)

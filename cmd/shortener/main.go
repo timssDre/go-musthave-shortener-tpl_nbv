@@ -2,28 +2,24 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/cmd/shortener/config"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/adapter/server"
-)
-
-var (
-	urlMap  = make(map[string]string)
-	addr    string
-	BaseURL string
 )
 
 func main() {
 	addrConfig := config.InitConfig()
 
-	flag.StringVar(&addr, "a", addrConfig.ServerAddr, "address and port to run server")
-	flag.StringVar(&BaseURL, "b", addrConfig.BaseURL, "address and port to run server addrResPos")
+	flag.StringVar(&addrConfig.ServerAddr, "a", addrConfig.ServerAddr, "address and port to run server")
+	flag.StringVar(&addrConfig.BaseURL, "b", addrConfig.BaseURL, "address and port to run server addrResPos")
 	flag.Parse()
 
+	fmt.Println(addrConfig.BaseURL)
 	app := struct {
 		server *server.Server
 	}{}
 
-	app.server = server.New(addr, addrConfig.BaseURL)
+	app.server = server.New(addrConfig.ServerAddr, addrConfig.BaseURL)
 
 	err := app.server.Start()
 	if err != nil {
