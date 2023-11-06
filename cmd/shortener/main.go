@@ -24,13 +24,13 @@ func main() {
 	flag.Parse()
 
 	r1 := gin.Default()
-	r2 := gin.Default()
+	//r2 := gin.Default()
 	r1.POST("/", shortenURLHandler)
-	r2.GET("/:id", redirectToOriginalURLHandler)
-	if err := r1.Run(*addr); err != nil {
-		panic(err)
-	}
-	if err := r2.Run(*addr); err != nil {
+	r1.GET("/:id", redirectToOriginalURLHandler)
+
+	err := r1.Run(*addr)
+	if err != nil {
+		fmt.Println("failed to start the browser ROST")
 		panic(err)
 	}
 
