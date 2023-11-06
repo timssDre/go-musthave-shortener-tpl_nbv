@@ -14,14 +14,14 @@ import (
 var (
 	urlMap  = make(map[string]string)
 	addr    string
-	BaseUrl string
+	BaseURL string
 )
 
 func main() {
 	addrConfig := config.InitConfig()
 
 	flag.StringVar(&addr, "a", addrConfig.ServerAddr, "address and port to run server")
-	flag.StringVar(&BaseUrl, "b", addrConfig.BaseUrl, "address and port to run server addrResPos")
+	flag.StringVar(&BaseURL, "b", addrConfig.BaseURL, "address and port to run server addrResPos")
 	flag.Parse()
 
 	r := gin.Default()
@@ -46,7 +46,7 @@ func shortenURLHandler(c *gin.Context) {
 	shortID := randSeq(8)
 	urlMap[shortID] = URLtoBody
 
-	shortURL := fmt.Sprintf("%s/%s", BaseUrl, shortID)
+	shortURL := fmt.Sprintf("%s/%s", BaseURL, shortID)
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
