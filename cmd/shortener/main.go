@@ -12,24 +12,25 @@ import (
 )
 
 var (
-	urlMap     = make(map[string]string)
-	addrResPos string
+	urlMap  = make(map[string]string)
+	addr    string
+	BaseUrl string
 )
 
 func main() {
 	addrConfig := config.InitConfig()
 
-	addr := flag.String("a", addrConfig.ServerAddr, "address and port to run server")
-	flag.StringVar(&addrResPos, "b", addrConfig.BaseAddr, "address and port to run server addrResPos")
+	flag.StringVar(&addr, "a", addrConfig.ServerAddr, "address and port to run server")
+	flag.StringVar(&BaseUrl, "b", addrConfig.BaseUrl, "address and port to run server addrResPos")
 	flag.Parse()
 
 	r := gin.Default()
 	r.POST("/", shortenURLHandler)
 	r.GET("/:id", redirectToOriginalURLHandler)
 
-	err := r.Run(*addr)
+	err := r.Run(addr)
 	if err != nil {
-		fmt.Println("failed to start the browser ROST")
+		fmt.Println("failed to start the browser")
 		panic(err)
 	}
 }
@@ -45,7 +46,7 @@ func shortenURLHandler(c *gin.Context) {
 	shortID := randSeq(8)
 	urlMap[shortID] = URLtoBody
 
-	shortURL := fmt.Sprintf("http://%s/%s", addrResPos, shortID)
+	shortURL := fmt.Sprintf("http://%s/%s", addr, shortID)
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
@@ -64,6 +65,10 @@ func redirectToOriginalURLHandler(c *gin.Context) {
 }
 
 func randSeq(n int) string {
+	if BaseUrl != "default" {
+		return BaseUrl
+	}
+
 	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, n)
 	for i := range b {
