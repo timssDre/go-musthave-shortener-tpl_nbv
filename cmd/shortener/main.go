@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"github.com/caarlos0/env/v6"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/cmd/shortener/config"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/adapter/server"
 )
@@ -14,14 +14,18 @@ func main() {
 	flag.StringVar(&addrConfig.BaseURL, "b", addrConfig.BaseURL, "address and port to run server addrResPos")
 	flag.Parse()
 
-	fmt.Println(addrConfig.BaseURL)
+	err := env.Parse(addrConfig)
+	if err != nil {
+		panic(err)
+	}
+
 	app := struct {
 		server *server.Server
 	}{}
 
 	app.server = server.New(addrConfig.ServerAddr, addrConfig.BaseURL)
 
-	err := app.server.Start()
+	err = app.server.Start()
 	if err != nil {
 		panic(err)
 	}

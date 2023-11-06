@@ -1,8 +1,8 @@
 package config
 
 type AddrConfig struct {
-	ServerAddr string
-	BaseURL    string
+	ServerAddr string `env:"SERVER_ADDRESS"`
+	BaseURL    string `env:"BASE_URL"`
 }
 
 func InitConfig() *AddrConfig {
