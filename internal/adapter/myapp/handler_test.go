@@ -43,7 +43,9 @@ func Test_shortenURLHandler(t *testing.T) {
 			r.ServeHTTP(w, request)
 
 			res := w.Result()
-			defer res.Body.Close()
+			defer func() {
+				_ = res.Body.Close()
+			}()
 			assert.Equal(t, tt.args.code, res.StatusCode)
 			assert.Equal(t, tt.args.contentType, res.Header.Get("Content-Type"))
 		})
@@ -85,7 +87,9 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			r.ServeHTTP(w, request)
 			res := w.Result()
-			defer res.Body.Close()
+			defer func() {
+				_ = res.Body.Close()
+			}()
 			assert.Equal(t, tt.argsGet.code, res.StatusCode)
 			assert.Equal(t, tt.argsGet.location, res.Header.Get("location"))
 		})
