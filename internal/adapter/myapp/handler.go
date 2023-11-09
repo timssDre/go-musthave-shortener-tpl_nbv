@@ -1,14 +1,15 @@
-package server
+package myapp
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
+	"math/rand"
 	"net/http"
 	"strings"
 )
 
-func (s *Server) shortenURLHandler(c *gin.Context) {
+func (s *Myapp) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -25,7 +26,16 @@ func (s *Server) shortenURLHandler(c *gin.Context) {
 	c.String(http.StatusCreated, shortURL)
 }
 
-func (s *Server) redirectToOriginalURLHandler(c *gin.Context) {
+func randSeq(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func (s *Myapp) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.urlMap[shortID]
 	if exists {

@@ -1,4 +1,4 @@
-package server
+package myapp
 
 import (
 	"github.com/gin-gonic/gin"
@@ -14,9 +14,9 @@ func Test_shortenURLHandler(t *testing.T) {
 		contentType string
 	}
 	tests := []struct {
-		name   string
-		server Server
-		args   args
+		name  string
+		myapp Myapp
+		args  args
 	}{
 		{
 			name: "test1",
@@ -29,13 +29,13 @@ func Test_shortenURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.server.urlMap = make(map[string]string)
-			tt.server.addr = "localhost:8081"
-			tt.server.BaseURL = "http://localhost:8081"
+			tt.myapp.urlMap = make(map[string]string)
+			tt.myapp.addr = "localhost:8081"
+			tt.myapp.BaseURL = "http://localhost:8081"
 
 			r := gin.Default()
 
-			r.POST("/", tt.server.shortenURLHandler)
+			r.POST("/", tt.myapp.ShortenURLHandler)
 
 			request := httptest.NewRequest(http.MethodPost, "/", nil)
 			w := httptest.NewRecorder()
@@ -58,7 +58,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}
 	testsGET := []struct {
 		name    string
-		server  Server
+		server  Myapp
 		argsGet argsGet
 	}{
 		{
@@ -79,7 +79,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 			tt.server.urlMap[tt.argsGet.testURL] = tt.argsGet.location
 
 			r := gin.Default()
-			r.GET("/:id", tt.server.redirectToOriginalURLHandler)
+			r.GET("/:id", tt.server.RedirectToOriginalURLHandler)
 
 			request := httptest.NewRequest(http.MethodGet, "/ads", nil)
 			w := httptest.NewRecorder()
