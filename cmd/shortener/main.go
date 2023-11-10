@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/adapter/api"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/api"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/config"
 )
 

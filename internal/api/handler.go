@@ -3,8 +3,9 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/service_usage"
 	"io"
-	"math/rand"
+
 	"net/http"
 	"strings"
 )
@@ -17,22 +18,13 @@ func (s *Storage) ShortenURLHandler(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(string(body))
 
-	shortID := randSeq(8)
+	shortID := service_usage.RandSeq(8)
 	s.urlMap[shortID] = URLtoBody
 
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
-}
-
-func randSeq(n int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }
 
 func (s *Storage) RedirectToOriginalURLHandler(c *gin.Context) {
