@@ -1,4 +1,4 @@
-package myapp
+package api
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (s *Myapp) ShortenURLHandler(c *gin.Context) {
+func (s *Api) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -35,7 +35,7 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func (s *Myapp) RedirectToOriginalURLHandler(c *gin.Context) {
+func (s *Api) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.urlMap[shortID]
 	if exists {

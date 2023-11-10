@@ -15,8 +15,8 @@ func InitConfig() *AddrConfig {
 		ServerAddr: "localhost:8080",
 		BaseURL:    "http://localhost:8080",
 	}
-	flag.StringVar(&config.ServerAddr, "a", config.ServerAddr, "address and port to run myapp")
-	flag.StringVar(&config.BaseURL, "b", config.BaseURL, "address and port to run myapp addrResPos")
+	flag.StringVar(&config.ServerAddr, "a", config.ServerAddr, "address and port to run api")
+	flag.StringVar(&config.BaseURL, "b", config.BaseURL, "address and port to run api addrResPos")
 	flag.Parse()
 	err := env.Parse(config)
 	if err != nil {
