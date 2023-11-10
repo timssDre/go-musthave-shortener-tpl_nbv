@@ -14,9 +14,9 @@ func Test_shortenURLHandler(t *testing.T) {
 		contentType string
 	}
 	tests := []struct {
-		name string
-		api  Api
-		args args
+		name    string
+		Storage Storage
+		args    args
 	}{
 		{
 			name: "test1",
@@ -29,13 +29,12 @@ func Test_shortenURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.api.urlMap = make(map[string]string)
-			tt.api.addr = "localhost:8081"
-			tt.api.BaseURL = "http://localhost:8081"
+			tt.Storage.urlMap = make(map[string]string)
+			tt.Storage.BaseURL = "http://localhost:8081"
 
 			r := gin.Default()
 
-			r.POST("/", tt.api.ShortenURLHandler)
+			r.POST("/", tt.Storage.ShortenURLHandler)
 
 			request := httptest.NewRequest(http.MethodPost, "/", nil)
 			w := httptest.NewRecorder()
@@ -59,7 +58,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}
 	testsGET := []struct {
 		name    string
-		api     Api
+		Storage Storage
 		argsGet argsGet
 	}{
 		{
@@ -74,13 +73,12 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 
 	for _, tt := range testsGET {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.api.addr = "localhost:8081"
-			tt.api.BaseURL = "http://localhost:8081"
-			tt.api.urlMap = make(map[string]string)
-			tt.api.urlMap[tt.argsGet.testURL] = tt.argsGet.location
+			tt.Storage.BaseURL = "http://localhost:8081"
+			tt.Storage.urlMap = make(map[string]string)
+			tt.Storage.urlMap[tt.argsGet.testURL] = tt.argsGet.location
 
 			r := gin.Default()
-			r.GET("/:id", tt.api.RedirectToOriginalURLHandler)
+			r.GET("/:id", tt.Storage.RedirectToOriginalURLHandler)
 
 			request := httptest.NewRequest(http.MethodGet, "/ads", nil)
 			w := httptest.NewRecorder()

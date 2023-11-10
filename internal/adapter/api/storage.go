@@ -1,7 +1,13 @@
 package api
 
-type Api struct {
-	addr    string
+func New(BaseURL string) *Storage {
+	return &Storage{
+		BaseURL: BaseURL,
+		urlMap:  make(map[string]string),
+	}
+}
+
+type Storage struct {
 	BaseURL string
 	urlMap  map[string]string
 }

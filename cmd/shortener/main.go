@@ -9,12 +9,12 @@ func main() {
 	addrConfig := config.InitConfig()
 
 	app := struct {
-		api *api.Api
+		api *api.Storage
 	}{}
 
-	app.api = api.New(addrConfig.ServerAddr, addrConfig.BaseURL)
+	app.api = api.New(addrConfig.BaseURL)
 
-	err := app.api.Start()
+	err := app.api.Start(addrConfig.ServerAddr)
 	if err != nil {
 		panic(err)
 	}
