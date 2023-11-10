@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/serviceUsage"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/utility"
 	"io"
 
 	"net/http"
@@ -18,7 +18,7 @@ func (s *Storage) ShortenURLHandler(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(string(body))
 
-	shortID := serviceUsage.RandSeq(8)
+	shortID := utility.RandSeq(8)
 	s.urlMap[shortID] = URLtoBody
 
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
