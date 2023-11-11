@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/utility"
 	"io"
 
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-func (s *Storage) ShortenURLHandler(c *gin.Context) {
+func (s *storage.Storage) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -27,7 +28,7 @@ func (s *Storage) ShortenURLHandler(c *gin.Context) {
 	c.String(http.StatusCreated, shortURL)
 }
 
-func (s *Storage) RedirectToOriginalURLHandler(c *gin.Context) {
+func (s *storage.Storage) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.urlMap[shortID]
 	if exists {

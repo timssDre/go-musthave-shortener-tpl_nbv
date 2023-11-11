@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,7 +16,7 @@ func Test_shortenURLHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		Storage Storage
+		Storage storage.Storage
 		args    args
 	}{
 		{
@@ -58,7 +59,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}
 	testsGET := []struct {
 		name    string
-		Storage Storage
+		Storage storage.Storage
 		argsGet argsGet
 	}{
 		{

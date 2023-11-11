@@ -1,4 +1,4 @@
-package api
+package storage
 
 func New(BaseURL string) *Storage {
 	return &Storage{
