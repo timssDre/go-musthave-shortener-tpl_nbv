@@ -3,10 +3,9 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 )
 
-func (s *storage.Storage) Start(ServerAddr string) error {
+func (s *Screwdriver) StartService(ServerAddr string) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.POST("/", s.ShortenURLHandler)
