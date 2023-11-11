@@ -31,7 +31,7 @@ func Test_shortenURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.Storage.UrlMap = make(map[string]string)
+			tt.Storage.URLMap = make(map[string]string)
 			tt.Storage.BaseURL = "http://localhost:8081"
 
 			r := gin.Default()
@@ -77,8 +77,8 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	for _, tt := range testsGET {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Storage.BaseURL = "http://localhost:8081"
-			tt.Storage.UrlMap = make(map[string]string)
-			tt.Storage.UrlMap[tt.argsGet.testURL] = tt.argsGet.location
+			tt.Storage.URLMap = make(map[string]string)
+			tt.Storage.URLMap[tt.argsGet.testURL] = tt.argsGet.location
 
 			r := gin.Default()
 			r.GET("/:id", tt.Storage.RedirectToOriginalURLHandler)

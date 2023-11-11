@@ -19,7 +19,7 @@ func (s *Screwdriver) ShortenURLHandler(c *gin.Context) {
 	URLtoBody := strings.TrimSpace(string(body))
 
 	shortID := utility.RandSeq(8)
-	s.UrlMap[shortID] = URLtoBody
+	s.URLMap[shortID] = URLtoBody
 
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
 
@@ -29,7 +29,7 @@ func (s *Screwdriver) ShortenURLHandler(c *gin.Context) {
 
 func (s *Screwdriver) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
-	originalURL, exists := s.UrlMap[shortID]
+	originalURL, exists := s.URLMap[shortID]
 	if exists {
 		c.Header("Location", originalURL)
 		c.String(http.StatusTemporaryRedirect, originalURL)
