@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/inmemory"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/server"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,7 +21,7 @@ func Test_shortenURLHandler(t *testing.T) {
 	}{
 		{
 			name:    "test1",
-			Storage: Screwdriver{Storage: &inmemory.Storage{}},
+			Storage: Screwdriver{Storage: &server.Storage{}},
 			args: args{
 				code:        201,
 				contentType: "text/plain",
@@ -65,7 +65,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}{
 		{
 			name:    "test1",
-			Storage: Screwdriver{Storage: &inmemory.Storage{}},
+			Storage: Screwdriver{Storage: &server.Storage{}},
 			argsGet: argsGet{
 				code:     307,
 				testURL:  "ads",

@@ -1,4 +1,4 @@
-package inmemory
+package server
 
 func New(BaseURL string) *Storage {
 	return &Storage{
