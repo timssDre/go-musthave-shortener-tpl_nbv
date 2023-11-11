@@ -3,14 +3,14 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/serviceUsage"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/utility"
 	"io"
 
 	"net/http"
 	"strings"
 )
 
-func (s *Storage) ShortenURLHandler(c *gin.Context) {
+func (s *Screwdriver) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -18,8 +18,8 @@ func (s *Storage) ShortenURLHandler(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(string(body))
 
-	shortID := serviceUsage.RandSeq(8)
-	s.urlMap[shortID] = URLtoBody
+	shortID := utility.RandSeq(8)
+	s.UrlMap[shortID] = URLtoBody
 
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
 
@@ -27,9 +27,9 @@ func (s *Storage) ShortenURLHandler(c *gin.Context) {
 	c.String(http.StatusCreated, shortURL)
 }
 
-func (s *Storage) RedirectToOriginalURLHandler(c *gin.Context) {
+func (s *Screwdriver) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
-	originalURL, exists := s.urlMap[shortID]
+	originalURL, exists := s.UrlMap[shortID]
 	if exists {
 		c.Header("Location", originalURL)
 		c.String(http.StatusTemporaryRedirect, originalURL)
