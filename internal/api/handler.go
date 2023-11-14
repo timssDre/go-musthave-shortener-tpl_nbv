@@ -28,10 +28,10 @@ func (s *StructAPI) ShortenURLHandler(c *gin.Context) {
 func (s *StructAPI) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.storage.GetValueMap(shortID)
-	if exists {
-		c.Header("Location", originalURL)
-		c.String(http.StatusTemporaryRedirect, originalURL)
+	if exists == false {
+		c.String(http.StatusTemporaryRedirect, "URL not found")
 		return
 	}
-	c.String(http.StatusTemporaryRedirect, "URL not found")
+	c.Header("Location", originalURL)
+	c.String(http.StatusTemporaryRedirect, originalURL)
 }
