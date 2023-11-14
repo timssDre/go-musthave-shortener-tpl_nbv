@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"net/http"
 	"net/http/httptest"
@@ -20,8 +21,12 @@ func Test_shortenURLHandler(t *testing.T) {
 		args    args
 	}{
 		{
-			name:    "test1",
-			Storage: StructAPI{storage: &storage.Storage{}},
+			name: "test1",
+			Storage: StructAPI{
+				StructService: &services.StructService{
+					Storage: &storage.Storage{},
+				},
+			},
 			args: args{
 				code:        201,
 				contentType: "text/plain",
@@ -31,8 +36,8 @@ func Test_shortenURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.Storage.storage.URLMap = make(map[string]string)
-			tt.Storage.BaseURL = "http://localhost:8081"
+			tt.Storage.StructService.Storage.URLs = make(map[string]string)
+			tt.Storage.StructService.BaseURL = "http://localhost:8081"
 
 			r := gin.Default()
 
@@ -64,8 +69,12 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 		argsGet argsGet
 	}{
 		{
-			name:    "test1",
-			Storage: StructAPI{storage: &storage.Storage{}},
+			name: "test1",
+			Storage: StructAPI{
+				StructService: &services.StructService{
+					Storage: &storage.Storage{},
+				},
+			},
 			argsGet: argsGet{
 				code:     307,
 				testURL:  "ads",
@@ -76,9 +85,9 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 
 	for _, tt := range testsGET {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.Storage.BaseURL = "http://localhost:8081"
-			tt.Storage.storage.URLMap = make(map[string]string)
-			tt.Storage.storage.SetValueMap(tt.argsGet.testURL, tt.argsGet.location)
+			tt.Storage.StructService.BaseURL = "http://localhost:8081"
+			tt.Storage.StructService.Storage.URLs = make(map[string]string)
+			tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
 
 			r := gin.Default()
 			r.GET("/:id", tt.Storage.RedirectToOriginalURLHandler)

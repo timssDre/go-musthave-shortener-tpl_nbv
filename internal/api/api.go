@@ -3,18 +3,18 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 )
 
 type StructAPI struct {
-	BaseURL string
-	storage *storage.Storage
+	StructService *services.StructService
 }
 
 func StartService(ServerAddr, BaseURL string, storage *storage.Storage) error {
+	storageShortener := services.New(BaseURL, storage)
 	api := &StructAPI{
-		BaseURL: BaseURL,
-		storage: storage,
+		StructService: storageShortener,
 	}
 
 	gin.SetMode(gin.ReleaseMode)

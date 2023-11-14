@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 
@@ -17,9 +16,7 @@ func (s *StructAPI) ShortenURLHandler(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(string(body))
 
-	shortID := RandSeq(8)
-	s.storage.SetValueMap(shortID, URLtoBody)
-	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
+	shortURL := s.StructService.GetShortURL(URLtoBody)
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
@@ -27,7 +24,7 @@ func (s *StructAPI) ShortenURLHandler(c *gin.Context) {
 
 func (s *StructAPI) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
-	originalURL, exists := s.storage.GetValueMap(shortID)
+	originalURL, exists := s.StructService.GetOriginalURL(shortID)
 	if !exists {
 		c.String(http.StatusTemporaryRedirect, "URL not found")
 		return

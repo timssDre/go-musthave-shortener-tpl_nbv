@@ -1,20 +1,20 @@
 package storage
 
 type Storage struct {
-	URLMap map[string]string
+	URLs map[string]string
 }
 
 func New() *Storage {
 	return &Storage{
-		URLMap: make(map[string]string),
+		URLs: make(map[string]string),
 	}
 }
 
-func (s *Storage) GetValueMap(key string) (string, bool) {
-	value, exists := s.URLMap[key]
+func (s *Storage) Get(key string) (string, bool) {
+	value, exists := s.URLs[key]
 	return value, exists
 }
 
-func (s *Storage) SetValueMap(key string, value string) {
-	s.URLMap[key] = value
+func (s *Storage) Set(key string, value string) {
+	s.URLs[key] = value
 }
