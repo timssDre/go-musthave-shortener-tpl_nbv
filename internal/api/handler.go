@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (s *StructApi) ShortenURLHandler(c *gin.Context) {
+func (s *StructAPI) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -25,7 +25,7 @@ func (s *StructApi) ShortenURLHandler(c *gin.Context) {
 	c.String(http.StatusCreated, shortURL)
 }
 
-func (s *StructApi) RedirectToOriginalURLHandler(c *gin.Context) {
+func (s *StructAPI) RedirectToOriginalURLHandler(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.storage.GetValueMap(shortID)
 	if exists {

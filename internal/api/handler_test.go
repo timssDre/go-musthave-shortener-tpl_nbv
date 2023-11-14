@@ -16,12 +16,12 @@ func Test_shortenURLHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		Storage StructApi
+		Storage StructAPI
 		args    args
 	}{
 		{
 			name:    "test1",
-			Storage: StructApi{storage: &storage.Storage{}},
+			Storage: StructAPI{storage: &storage.Storage{}},
 			args: args{
 				code:        201,
 				contentType: "text/plain",
@@ -60,12 +60,12 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}
 	testsGET := []struct {
 		name    string
-		Storage StructApi
+		Storage StructAPI
 		argsGet argsGet
 	}{
 		{
 			name:    "test1",
-			Storage: StructApi{storage: &storage.Storage{}},
+			Storage: StructAPI{storage: &storage.Storage{}},
 			argsGet: argsGet{
 				code:     307,
 				testURL:  "ads",
