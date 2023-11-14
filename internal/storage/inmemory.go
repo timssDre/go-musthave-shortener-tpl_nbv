@@ -1,9 +1,12 @@
-package server
+package storage
 
-func New(BaseURL string) *Storage {
+type Storage struct {
+	URLMap map[string]string
+}
+
+func New() *Storage {
 	return &Storage{
-		BaseURL: BaseURL,
-		URLMap:  make(map[string]string),
+		URLMap: make(map[string]string),
 	}
 }
 
@@ -14,9 +17,4 @@ func (s *Storage) GetValueMap(key string) (string, bool) {
 
 func (s *Storage) SetValueMap(key string, value string) {
 	s.URLMap[key] = value
-}
-
-type Storage struct {
-	BaseURL string
-	URLMap  map[string]string
 }

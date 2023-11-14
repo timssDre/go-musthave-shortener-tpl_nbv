@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/server"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,12 +16,12 @@ func Test_shortenURLHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		Storage Screwdriver
+		Storage Api
 		args    args
 	}{
 		{
 			name:    "test1",
-			Storage: Screwdriver{Storage: &server.Storage{}},
+			Storage: Api{storage: &storage.Storage{}},
 			args: args{
 				code:        201,
 				contentType: "text/plain",
@@ -31,7 +31,7 @@ func Test_shortenURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.Storage.URLMap = make(map[string]string)
+			tt.Storage.storage.URLMap = make(map[string]string)
 			tt.Storage.BaseURL = "http://localhost:8081"
 
 			r := gin.Default()
@@ -60,12 +60,12 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	}
 	testsGET := []struct {
 		name    string
-		Storage Screwdriver
+		Storage Api
 		argsGet argsGet
 	}{
 		{
 			name:    "test1",
-			Storage: Screwdriver{Storage: &server.Storage{}},
+			Storage: Api{storage: &storage.Storage{}},
 			argsGet: argsGet{
 				code:     307,
 				testURL:  "ads",
@@ -77,8 +77,8 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 	for _, tt := range testsGET {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Storage.BaseURL = "http://localhost:8081"
-			tt.Storage.URLMap = make(map[string]string)
-			tt.Storage.SetValueMap(tt.argsGet.testURL, tt.argsGet.location)
+			tt.Storage.storage.URLMap = make(map[string]string)
+			tt.Storage.storage.SetValueMap(tt.argsGet.testURL, tt.argsGet.location)
 
 			r := gin.Default()
 			r.GET("/:id", tt.Storage.RedirectToOriginalURLHandler)
