@@ -6,13 +6,13 @@ import (
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 )
 
-type Api struct {
+type StructApi struct {
 	BaseURL string
 	storage *storage.Storage
 }
 
 func StartService(ServerAddr, BaseURL string, storage *storage.Storage) error {
-	api := &Api{
+	api := &StructApi{
 		BaseURL: BaseURL,
 		storage: storage,
 	}
