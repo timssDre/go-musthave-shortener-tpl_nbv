@@ -6,20 +6,20 @@ import (
 	"math/rand"
 )
 
-type StructService struct {
+type ShortenerService struct {
 	BaseURL string
 	Storage *storage.Storage
 }
 
-func New(BaseURL string, storage *storage.Storage) *StructService {
-	s := &StructService{
+func NewShortenerService(BaseURL string, storage *storage.Storage) *ShortenerService {
+	s := &ShortenerService{
 		BaseURL: BaseURL,
 		Storage: storage,
 	}
 	return s
 }
 
-func (s *StructService) GetShortURL(originalURL string) string {
+func (s *ShortenerService) GetShortURL(originalURL string) string {
 	shortID := randSeq(8)
 	s.Storage.Set(shortID, originalURL)
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
@@ -35,6 +35,6 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func (s *StructService) GetOriginalURL(shortID string) (string, bool) {
+func (s *ShortenerService) GetOriginalURL(shortID string) (string, bool) {
 	return s.Storage.Get(shortID)
 }

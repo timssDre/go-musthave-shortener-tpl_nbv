@@ -5,13 +5,13 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
-type AddrConfig struct {
+type Config struct {
 	ServerAddr string `env:"SERVER_ADDRESS"`
 	BaseURL    string `env:"BASE_URL"`
 }
 
-func InitConfig() *AddrConfig {
-	config := &AddrConfig{
+func InitConfig() *Config {
+	config := &Config{
 		ServerAddr: "localhost:8080",
 		BaseURL:    "http://localhost:8080",
 	}

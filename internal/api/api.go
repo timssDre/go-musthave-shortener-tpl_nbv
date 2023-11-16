@@ -7,13 +7,13 @@ import (
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 )
 
-type StructAPI struct {
-	StructService *services.StructService
+type RestAPI struct {
+	StructService *services.ShortenerService
 }
 
-func StartService(ServerAddr, BaseURL string, storage *storage.Storage) error {
-	storageShortener := services.New(BaseURL, storage)
-	api := &StructAPI{
+func StartRestAPI(ServerAddr, BaseURL string, storage *storage.Storage) error {
+	storageShortener := services.NewShortenerService(BaseURL, storage)
+	api := &RestAPI{
 		StructService: storageShortener,
 	}
 

@@ -4,7 +4,7 @@ type Storage struct {
 	URLs map[string]string
 }
 
-func New() *Storage {
+func NewStorage() *Storage {
 	return &Storage{
 		URLs: make(map[string]string),
 	}
