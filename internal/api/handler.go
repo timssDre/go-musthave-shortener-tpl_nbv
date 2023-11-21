@@ -10,7 +10,7 @@ import (
 )
 
 type StructURL struct {
-	Url string `json:"url"`
+	Performance string `json:"url"`
 }
 
 func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
@@ -21,8 +21,8 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(string(body))
 	shortURL := s.StructService.GetShortURL(URLtoBody)
-	urlStruct := StructURL{Url: shortURL}
-	respJSON, err := json.Marshal(urlStruct)
+	StructPerformance := StructURL{Performance: shortURL}
+	respJSON, err := json.Marshal(StructPerformance)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
