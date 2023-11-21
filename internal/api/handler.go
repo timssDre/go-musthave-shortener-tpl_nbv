@@ -1,12 +1,17 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io"
 
 	"net/http"
 	"strings"
 )
+
+type StructURL struct {
+	Url string `json:"url"`
+}
 
 func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
@@ -15,11 +20,15 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 		return
 	}
 	URLtoBody := strings.TrimSpace(string(body))
-
 	shortURL := s.StructService.GetShortURL(URLtoBody)
-
-	c.Header("Content-Type", "text/plain")
-	c.String(http.StatusCreated, shortURL)
+	urlStruct := StructURL{Url: shortURL}
+	respJson, err := json.Marshal(urlStruct)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+	c.Header("Content-Type", "application/json")
+	c.Data(http.StatusCreated, "application/json", respJson)
 }
 
 func (s *RestAPI) RedirectToOriginalURLHandler(c *gin.Context) {
