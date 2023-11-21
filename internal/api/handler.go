@@ -45,7 +45,7 @@ func (s *RestAPI) ShortenURLHandlerJSON(c *gin.Context) {
 	}
 	URLtoBody := strings.TrimSpace(decoderBody.PerformanceURL)
 	shortURL := s.StructService.GetShortURL(URLtoBody)
-	StructPerformance := StructEntrance{PerformanceURL: shortURL}
+	StructPerformance := StructRes{PerformanceResult: shortURL}
 	respJSON, err := json.Marshal(StructPerformance)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
