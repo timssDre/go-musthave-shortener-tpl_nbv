@@ -29,7 +29,7 @@ func Test_shortenURLHandler(t *testing.T) {
 			},
 			args: args{
 				code:        201,
-				contentType: "text/plain",
+				contentType: "application/json",
 			},
 		},
 	}
