@@ -57,6 +57,53 @@ func Test_shortenURLHandler(t *testing.T) {
 	}
 }
 
+func Test_shortenURLHandlerURL(t *testing.T) {
+	type args struct {
+		code        int
+		contentType string
+	}
+	tests := []struct {
+		name    string
+		Storage RestAPI
+		args    args
+	}{
+		{
+			name: "test1",
+			Storage: RestAPI{
+				StructService: &services.ShortenerService{
+					Storage: &storage.Storage{},
+				},
+			},
+			args: args{
+				code:        201,
+				contentType: "application/json",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.Storage.StructService.Storage.URLs = make(map[string]string)
+			tt.Storage.StructService.BaseURL = "http://localhost:8081"
+
+			r := gin.Default()
+
+			r.POST("/api/shorten", tt.Storage.ShortenURLHandlerJSON)
+
+			request := httptest.NewRequest(http.MethodPost, "/api/shorten", nil)
+			w := httptest.NewRecorder()
+
+			r.ServeHTTP(w, request)
+
+			res := w.Result()
+			defer res.Body.Close()
+
+			assert.Equal(t, tt.args.code, res.StatusCode)
+			assert.Equal(t, tt.args.contentType, res.Header.Get("Content-Type"))
+		})
+	}
+}
+
 func Test_redirectToOriginalURLHandler(t *testing.T) {
 	type argsGet struct {
 		code     int
