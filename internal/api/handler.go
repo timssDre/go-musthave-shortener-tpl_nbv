@@ -22,13 +22,13 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	URLtoBody := strings.TrimSpace(string(body))
 	shortURL := s.StructService.GetShortURL(URLtoBody)
 	urlStruct := StructURL{Url: shortURL}
-	respJson, err := json.Marshal(urlStruct)
+	respJSON, err := json.Marshal(urlStruct)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
 	c.Header("Content-Type", "application/json")
-	c.Data(http.StatusCreated, "application/json", respJson)
+	c.Data(http.StatusCreated, "application/json", respJSON)
 }
 
 func (s *RestAPI) RedirectToOriginalURLHandler(c *gin.Context) {
