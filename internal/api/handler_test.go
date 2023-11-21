@@ -34,6 +34,7 @@ func Test_shortenURLHandler(t *testing.T) {
 				code:        201,
 				contentType: "text/plain",
 			},
+			body: "https://practicum.yandex.ru/",
 		},
 	}
 
@@ -46,7 +47,7 @@ func Test_shortenURLHandler(t *testing.T) {
 
 			r.POST("/", tt.Storage.ShortenURLHandler)
 
-			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("https://practicum.yandex.ru/"))
+			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.body))
 			w := httptest.NewRecorder()
 
 			r.ServeHTTP(w, request)
@@ -72,6 +73,7 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 		name    string
 		Storage RestAPI
 		args    args
+		body    reqBody
 	}{
 		{
 			name: "test1",
@@ -84,6 +86,9 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 				code:        201,
 				contentType: "application/json",
 			},
+			body: reqBody{
+				"https://practicum.yandex.ru",
+			},
 		},
 	}
 
@@ -95,10 +100,7 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 			r := gin.Default()
 
 			r.POST("/api/shorten", tt.Storage.ShortenURLHandlerJSON)
-			tbody := reqBody{
-				"https://practicum.yandex.ru",
-			}
-			jsonBody, err := json.Marshal(tbody)
+			jsonBody, err := json.Marshal(tt.body)
 			if err != nil {
 				t.Fatal(err)
 			}
