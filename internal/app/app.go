@@ -9,7 +9,7 @@ import (
 func Start(config *config.Config) {
 	storageInstance := storage.NewStorage()
 
-	err := api.StartRestAPI(config.ServerAddr, config.BaseURL, storageInstance)
+	err := api.StartRestAPI(config.ServerAddr, config.BaseURL, config.LogLevel, storageInstance)
 	if err != nil {
 		panic(err)
 	}
