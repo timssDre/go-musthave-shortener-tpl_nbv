@@ -29,7 +29,7 @@ func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, storage *storage.
 	r := gin.Default()
 
 	r.Use(middlewere.RequestLogger(logger.Log), gin.Recovery())
-	r.Use(middlewere.CompressRequest(logger.Log), gin.Recovery())
+	r.Use(middlewere.CompressRequest(), gin.Recovery())
 
 	api.setRoutes(r)
 

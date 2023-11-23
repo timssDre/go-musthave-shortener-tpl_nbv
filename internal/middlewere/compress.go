@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"io"
 	"log"
 )
@@ -18,7 +17,7 @@ func (w gzipWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
 
-func CompressRequest(logger *zap.Logger) gin.HandlerFunc {
+func CompressRequest() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		if ctx.Request.Header.Get("Content-Type") == "application/json" ||
