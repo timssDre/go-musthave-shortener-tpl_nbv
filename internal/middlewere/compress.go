@@ -18,26 +18,25 @@ func (w gzipWriter) Write(b []byte) (int, error) {
 }
 
 func CompressRequest() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(c *gin.Context) {
 
-		if ctx.Request.Header.Get("Content-Type") == "application/json" ||
-			ctx.Request.Header.Get("Content-Type") == "text/html" {
+		if c.Request.Header.Get("Content-Type") == "application/json" ||
+			c.Request.Header.Get("Content-Type") == "text/html" {
 
-			acceptEncodings := ctx.Request.Header.Values("Accept-Encoding")
+			acceptEncodings := c.Request.Header.Values("Accept-Encoding")
 
 			if foundHeader(acceptEncodings) {
-				compressWriter := gzip.NewWriter(ctx.Writer)
+				compressWriter := gzip.NewWriter(c.Writer)
 				defer compressWriter.Close()
-
-				ctx.Header("Content-Encoding", "gzip")
-				ctx.Writer = &gzipWriter{ctx.Writer, compressWriter}
+				c.Header("Content-Encoding", "gzip")
+				c.Writer = &gzipWriter{c.Writer, compressWriter}
 			}
 		}
 
-		contentEncodings := ctx.Request.Header.Values("Content-Encoding")
+		contentEncodings := c.Request.Header.Values("Content-Encoding")
 
 		if foundHeader(contentEncodings) {
-			compressReader, err := gzip.NewReader(ctx.Request.Body)
+			compressReader, err := gzip.NewReader(c.Request.Body)
 			if err != nil {
 				log.Fatalf("error: new reader: %d", err)
 				return
@@ -50,10 +49,10 @@ func CompressRequest() gin.HandlerFunc {
 				return
 			}
 
-			ctx.Request.Body = io.NopCloser(bytes.NewReader(body))
-			ctx.Request.ContentLength = int64(len(body))
+			c.Request.Body = io.NopCloser(bytes.NewReader(body))
+			c.Request.ContentLength = int64(len(body))
 		}
-		ctx.Next()
+		c.Next()
 	}
 }
 

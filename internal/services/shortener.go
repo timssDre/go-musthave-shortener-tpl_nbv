@@ -2,8 +2,8 @@ package services
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
-	"math/rand"
 )
 
 type ShortenerService struct {
@@ -27,12 +27,8 @@ func (s *ShortenerService) GetShortURL(originalURL string) string {
 }
 
 func randSeq(n int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
+	newUUID := uuid.New()
+	return newUUID.String()
 }
 
 func (s *ShortenerService) GetOriginalURL(shortID string) (string, bool) {
