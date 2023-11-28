@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
-	"log"
 )
 
 type ShortenerService struct {
@@ -20,15 +19,11 @@ func NewShortenerService(BaseURL string, storage *storage.Storage) *ShortenerSer
 	return s
 }
 
-func (s *ShortenerService) GetShortURL(originalURL string) (string, error) {
+func (s *ShortenerService) GetShortURL(originalURL string) string {
 	shortID := randSeq()
-	err := s.Storage.Set(shortID, originalURL)
-	if err != nil {
-		log.Fatal("failed to record event to file")
-		//return "", err
-	}
+	s.Storage.Set(shortID, originalURL)
 	shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
-	return shortURL, err
+	return shortURL
 }
 
 func randSeq() string {

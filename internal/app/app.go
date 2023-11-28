@@ -9,12 +9,7 @@ import (
 
 func Start(config *config.Config) {
 	storageInstance := storage.NewStorage()
-	err := storageInstance.FillFromStorage(config.FilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = api.StartRestAPI(config.ServerAddr, config.BaseURL, config.LogLevel, storageInstance)
+	err := api.StartRestAPI(config.ServerAddr, config.BaseURL, config.LogLevel, config.FilePath, storageInstance)
 	if err != nil {
 		log.Fatal(err)
 	}
