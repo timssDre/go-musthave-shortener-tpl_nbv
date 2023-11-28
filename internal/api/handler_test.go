@@ -99,7 +99,7 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 
 			r := gin.Default()
 
-			r.POST("/api/shorten", tt.Storage.ShortenURLHandlerJSON)
+			r.POST("/api/shorten", tt.Storage.ShortenURLJSON)
 			jsonBody, err := json.Marshal(tt.body)
 			if err != nil {
 				t.Fatal(err)
@@ -152,7 +152,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 			tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
 
 			r := gin.Default()
-			r.GET("/:id", tt.Storage.RedirectToOriginalURLHandler)
+			r.GET("/:id", tt.Storage.RedirectToOriginalURL)
 
 			request := httptest.NewRequest(http.MethodGet, "/ads", nil)
 			w := httptest.NewRecorder()

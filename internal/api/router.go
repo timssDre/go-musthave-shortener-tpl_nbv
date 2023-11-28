@@ -6,6 +6,6 @@ import (
 
 func (s *RestAPI) setRoutes(r *gin.Engine) {
 	r.POST("/", s.ShortenURLHandler)
-	r.POST("/api/shorten", s.ShortenURLHandlerJSON)
-	r.GET("/:id", s.RedirectToOriginalURLHandler)
+	r.POST("/api/shorten", s.ShortenURLJSON)
+	r.GET("/:id", s.RedirectToOriginalURL)
 }

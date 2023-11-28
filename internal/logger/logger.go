@@ -4,7 +4,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var Log = zap.NewNop()
+var Log *zap.SugaredLogger
 
 func Initialize(level string) error {
 	lvl, err := zap.ParseAtomicLevel(level)
@@ -17,6 +17,6 @@ func Initialize(level string) error {
 	if err != nil {
 		return err
 	}
-	Log = zl
+	Log = zl.Sugar()
 	return nil
 }

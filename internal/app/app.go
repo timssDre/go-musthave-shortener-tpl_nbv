@@ -8,7 +8,8 @@ import (
 )
 
 func Start(config *config.Config) {
-	storageInstance, err := storage.NewStorage(config.FilePath)
+	storageInstance := storage.NewStorage()
+	err := storageInstance.FillFromStorage(config.FilePath)
 	if err != nil {
 		log.Fatal(err)
 	}

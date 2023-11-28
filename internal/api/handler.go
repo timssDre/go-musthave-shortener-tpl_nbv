@@ -9,12 +9,12 @@ import (
 	"strings"
 )
 
-type StructEntrance struct {
-	PerformanceURL string `json:"url"`
+type Request struct {
+	URL string `json:"url"`
 }
 
-type StructRes struct {
-	PerformanceResult string `json:"result"`
+type Response struct {
+	Result string `json:"result"`
 }
 
 func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
@@ -33,26 +33,21 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	c.String(http.StatusCreated, shortURL)
 }
 
-func (s *RestAPI) ShortenURLHandlerJSON(c *gin.Context) {
-	body, err := io.ReadAll(c.Request.Body)
+func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
+	var decoderBody Request
+	decoder := json.NewDecoder(c.Request.Body)
+	err := decoder.Decode(&decoderBody)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
-
-	var decoderBody StructEntrance
-	err = json.Unmarshal(body, &decoderBody)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
-		return
-	}
-	URLtoBody := strings.TrimSpace(decoderBody.PerformanceURL)
-	shortURL, err := s.StructService.GetShortURL(URLtoBody)
+	url := strings.TrimSpace(decoderBody.URL)
+	shortURL, err := s.StructService.GetShortURL(url)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "failed to record event to file", http.StatusInternalServerError)
 		return
 	}
-	StructPerformance := StructRes{PerformanceResult: shortURL}
+	StructPerformance := Response{Result: shortURL}
 	respJSON, err := json.Marshal(StructPerformance)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
@@ -63,7 +58,7 @@ func (s *RestAPI) ShortenURLHandlerJSON(c *gin.Context) {
 	c.Data(http.StatusCreated, "application/json", respJSON)
 }
 
-func (s *RestAPI) RedirectToOriginalURLHandler(c *gin.Context) {
+func (s *RestAPI) RedirectToOriginalURL(c *gin.Context) {
 	shortID := c.Param("id")
 	originalURL, exists := s.StructService.GetOriginalURL(shortID)
 	if !exists {

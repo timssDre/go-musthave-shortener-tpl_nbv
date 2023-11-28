@@ -1,4 +1,4 @@
-package middlewere
+package middleware
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
+	"strings"
 )
 
 type gzipWriter struct {
@@ -17,7 +18,7 @@ func (w gzipWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
 
-func CompressRequest() gin.HandlerFunc {
+func CompressMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		if c.Request.Header.Get("Content-Type") == "application/json" ||
@@ -34,7 +35,6 @@ func CompressRequest() gin.HandlerFunc {
 		}
 
 		contentEncodings := c.Request.Header.Values("Content-Encoding")
-
 		if foundHeader(contentEncodings) {
 			compressReader, err := gzip.NewReader(c.Request.Body)
 			if err != nil {
@@ -58,7 +58,7 @@ func CompressRequest() gin.HandlerFunc {
 
 func foundHeader(content []string) bool {
 	for _, v := range content {
-		if v == "gzip" {
+		if strings.Contains(v, "gzip") {
 			return true
 		}
 	}

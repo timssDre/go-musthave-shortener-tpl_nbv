@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/logger"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/middlewere"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/middleware"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"go.uber.org/zap"
@@ -28,8 +28,8 @@ func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, storage *storage.
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	r.Use(middlewere.RequestLogger(logger.Log), gin.Recovery())
-	r.Use(middlewere.CompressRequest(), gin.Recovery())
+	r.Use(middleware.LoggerMiddleware(logger.Log), gin.Recovery())
+	r.Use(middleware.CompressMiddleware(), gin.Recovery())
 
 	api.setRoutes(r)
 

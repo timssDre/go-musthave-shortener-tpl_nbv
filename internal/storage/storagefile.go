@@ -2,7 +2,7 @@ package storage
 
 import "encoding/json"
 
-func (s *Storage) WriteEvent(event *Event) error {
+func (s *Storage) WriteEvent(event *ShortCollector) error {
 	data, err := json.Marshal(&event)
 	if err != nil {
 		return err

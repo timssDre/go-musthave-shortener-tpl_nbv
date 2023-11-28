@@ -16,29 +16,27 @@ type Storage struct {
 	maxUUID int
 }
 
-type Event struct {
+type ShortCollector struct {
 	NumberUUID  string `json:"uuid"`
 	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 }
 
-func NewStorage(filePath string) (*Storage, error) {
+func NewStorage() *Storage {
+	return &Storage{
+		URLs: make(map[string]string),
+	}
+}
+
+func (s *Storage) FillFromStorage(filePath string) error {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	newDecoder := json.NewDecoder(file)
-	URLs := make(map[string]string)
 	maxUUID := 0
-
-	answer := &Storage{
-		URLs:   URLs,
-		file:   file,
-		writer: bufio.NewWriter(file),
-	}
-
 	for {
-		var event Event
+		var event ShortCollector
 		if err := newDecoder.Decode(&event); err != nil {
 			if err == io.EOF {
 				break
@@ -48,10 +46,12 @@ func NewStorage(filePath string) (*Storage, error) {
 			}
 		}
 		maxUUID += 1
-		URLs[event.OriginalURL] = event.ShortURL
+		s.URLs[event.OriginalURL] = event.ShortURL
 	}
-	answer.maxUUID = maxUUID
-	return answer, nil
+	s.file = file
+	s.maxUUID = maxUUID
+	s.writer = bufio.NewWriter(file)
+	return nil
 }
 
 func (s *Storage) Set(key string, value string) error {
@@ -60,7 +60,7 @@ func (s *Storage) Set(key string, value string) error {
 		return nil
 	}
 	s.maxUUID += 1
-	event := Event{
+	event := ShortCollector{
 		strconv.Itoa(s.maxUUID),
 		key,
 		value,
