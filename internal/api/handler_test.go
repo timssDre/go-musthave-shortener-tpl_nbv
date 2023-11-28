@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/dump"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"net/http"
@@ -29,6 +30,7 @@ func Test_shortenURLHandler(t *testing.T) {
 				StructService: &services.ShortenerService{
 					Storage: &storage.Storage{},
 				},
+				StructDump: &dump.Memory{},
 			},
 			args: args{
 				code:        201,
@@ -42,7 +44,7 @@ func Test_shortenURLHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Storage.StructService.Storage.URLs = make(map[string]string)
 			tt.Storage.StructService.BaseURL = "http://localhost:8081"
-
+			tt.Storage.StructDump.File = nil
 			r := gin.Default()
 
 			r.POST("/", tt.Storage.ShortenURLHandler)
@@ -81,6 +83,7 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 				StructService: &services.ShortenerService{
 					Storage: &storage.Storage{},
 				},
+				StructDump: &dump.Memory{},
 			},
 			args: args{
 				code:        201,
@@ -96,7 +99,7 @@ func Test_shortenURLHandlerURL(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Storage.StructService.Storage.URLs = make(map[string]string)
 			tt.Storage.StructService.BaseURL = "http://localhost:8081"
-
+			tt.Storage.StructDump.File = nil
 			r := gin.Default()
 
 			r.POST("/api/shorten", tt.Storage.ShortenURLJSON)
@@ -136,6 +139,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 				StructService: &services.ShortenerService{
 					Storage: &storage.Storage{},
 				},
+				StructDump: &dump.Memory{},
 			},
 			argsGet: argsGet{
 				code:     307,
@@ -150,6 +154,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 			tt.Storage.StructService.BaseURL = "http://localhost:8081"
 			tt.Storage.StructService.Storage.URLs = make(map[string]string)
 			tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
+			tt.Storage.StructDump.File = nil
 
 			r := gin.Default()
 			r.GET("/:id", tt.Storage.RedirectToOriginalURL)

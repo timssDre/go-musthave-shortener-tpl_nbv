@@ -12,7 +12,7 @@ import (
 
 type Memory struct {
 	Storage *services.ShortenerService
-	file    *os.File
+	File    *os.File
 	writer  *bufio.Writer
 	maxUUID int
 }
@@ -48,25 +48,28 @@ func (m *Memory) FillFromStorage(filePath string, storage *services.ShortenerSer
 		maxUUID += 1
 		storage.Storage.URLs[event.OriginalURL] = event.ShortURL
 	}
-	m.file = file
+	m.File = file
 	m.maxUUID = maxUUID
 	m.writer = bufio.NewWriter(file)
 	return nil
 }
 
 func (m *Memory) Set(key, value string) error {
+	if m.File == nil {
+		return nil
+	}
 	m.maxUUID += 1
-	event := ShortCollector{
+	ShortCollector := ShortCollector{
 		strconv.Itoa(m.maxUUID),
 		key,
 		value,
 	}
-	err := m.writeEvent(&event)
+	err := m.writeEvent(&ShortCollector)
 	return err
 }
 
-func (m *Memory) writeEvent(event *ShortCollector) error {
-	data, err := json.Marshal(&event)
+func (m *Memory) writeEvent(ShortCollector *ShortCollector) error {
+	data, err := json.Marshal(&ShortCollector)
 	if err != nil {
 		return err
 	}
