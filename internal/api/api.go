@@ -1,38 +1,34 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/dump"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/logger"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/middleware"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"go.uber.org/zap"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 type RestAPI struct {
 	StructService *services.ShortenerService
-	StructDump    *dump.Memory
 }
 
-func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, FilePath string, storage *storage.Storage) error {
+func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, storage *storage.Storage) error {
 	if err := logger.Initialize(LogLevel); err != nil {
 		return err
 	}
 	logger.Log.Info("Running server", zap.String("address", ServerAddr))
 
 	storageShortener := services.NewShortenerService(BaseURL, storage)
-	d := dump.NewMemory()
-	err := d.FillFromStorage(FilePath, storageShortener)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	api := &RestAPI{
 		StructService: storageShortener,
-		StructDump:    d,
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -43,11 +39,25 @@ func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, FilePath string, 
 
 	api.setRoutes(r)
 
-	err = r.Run(ServerAddr)
-	if err != nil {
-		fmt.Println("failed to start the browser")
-		return err
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
 	}
-	fmt.Println("nbv")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	go func() {
+		err := r.Run(ServerAddr)
+		if err != nil {
+			fmt.Println("failed to start the browser")
+		}
+	}()
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Ошибка при остановке сервера: %v\n", err)
+	}
+
 	return nil
 }

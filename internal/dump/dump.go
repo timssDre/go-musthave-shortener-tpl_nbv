@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"io"
 	"os"
 	"strconv"
@@ -13,8 +14,6 @@ import (
 type Memory struct {
 	Storage *services.ShortenerService
 	File    *os.File
-	writer  *bufio.Writer
-	maxUUID int
 }
 type ShortCollector struct {
 	NumberUUID  string `json:"uuid"`
@@ -22,13 +21,7 @@ type ShortCollector struct {
 	OriginalURL string `json:"original_url"`
 }
 
-func NewMemory() *Memory {
-	return &Memory{
-		maxUUID: 0,
-	}
-}
-
-func (m *Memory) FillFromStorage(filePath string, storage *services.ShortenerService) error {
+func FillFromStorage(storageInstance *storage.Storage, filePath string) error {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
 		return err
@@ -46,44 +39,44 @@ func (m *Memory) FillFromStorage(filePath string, storage *services.ShortenerSer
 			}
 		}
 		maxUUID += 1
-		storage.Storage.URLs[event.OriginalURL] = event.ShortURL
+		storageInstance.Set(event.OriginalURL, event.ShortURL)
 	}
-	m.File = file
-	m.maxUUID = maxUUID
-	m.writer = bufio.NewWriter(file)
 	return nil
 }
 
-func (m *Memory) Set(key, value string) error {
-	if m.File == nil {
-		return nil
+func Set(storageInstance *storage.Storage, filePath string, BaseURL string) error {
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
+	maxUUID := 0
+	for key, value := range storageInstance.URLs {
+		shortURL := fmt.Sprintf("%s/%s", BaseURL, key)
+		maxUUID += 1
+		ShortCollector := ShortCollector{
+			strconv.Itoa(maxUUID),
+			shortURL,
+			value,
+		}
+		writer := bufio.NewWriter(file)
+		err = writeEvent(&ShortCollector, writer)
 	}
-	m.maxUUID += 1
-	ShortCollector := ShortCollector{
-		strconv.Itoa(m.maxUUID),
-		key,
-		value,
-	}
-	err := m.writeEvent(&ShortCollector)
 	return err
 }
 
-func (m *Memory) writeEvent(ShortCollector *ShortCollector) error {
+func writeEvent(ShortCollector *ShortCollector, writer *bufio.Writer) error {
 	data, err := json.Marshal(&ShortCollector)
 	if err != nil {
 		return err
 	}
 
 	// записываем событие в буфер
-	if _, err := m.writer.Write(data); err != nil {
+	if _, err := writer.Write(data); err != nil {
 		return err
 	}
 
 	// добавляем перенос строки
-	if err := m.writer.WriteByte('\n'); err != nil {
+	if err := writer.WriteByte('\n'); err != nil {
 		return err
 	}
 
 	// записываем буфер в файл
-	return m.writer.Flush()
+	return writer.Flush()
 }
