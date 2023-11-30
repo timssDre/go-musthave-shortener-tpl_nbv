@@ -1,10 +1,5 @@
 package storage
 
-type Repository interface {
-	Set(shortID string, originalURL string)
-	Get(shortID string) (string, bool)
-}
-
 type Storage struct {
 	URLs map[string]string
 }
