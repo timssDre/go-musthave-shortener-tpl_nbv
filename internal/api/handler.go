@@ -25,10 +25,6 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	}
 	url := strings.TrimSpace(string(body))
 	shortURL := s.StructService.Set(url)
-	//if err = s.StructDump.Set(url, shortURL); err != nil {
-	//	c.String(http.StatusInternalServerError, "failed to record event to file", http.StatusInternalServerError)
-	//	return
-	//}
 
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
@@ -44,10 +40,7 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 	}
 	url := strings.TrimSpace(decoderBody.URL)
 	shortURL := s.StructService.Set(url)
-	//if err = s.StructDump.Set(url, shortURL); err != nil {
-	//	c.String(http.StatusInternalServerError, "failed to record event to file", http.StatusInternalServerError)
-	//	return
-	//}
+
 	StructPerformance := Response{Result: shortURL}
 	respJSON, err := json.Marshal(StructPerformance)
 	if err != nil {

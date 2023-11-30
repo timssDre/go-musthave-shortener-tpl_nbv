@@ -10,6 +10,7 @@ func main() {
 	addrConfig := config.InitConfig()
 
 	storageInstance := storage.NewStorage()
-	app.Start(addrConfig, storageInstance)
-	app.Stop(addrConfig, storageInstance)
+	appInstance := app.NewApp(storageInstance, addrConfig)
+	appInstance.Start()
+	appInstance.Stop()
 }
