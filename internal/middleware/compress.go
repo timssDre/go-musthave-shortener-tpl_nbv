@@ -36,7 +36,7 @@ func CompressMiddleware() gin.HandlerFunc {
 
 		//contentEncodings := c.Request.Header.Values("Content-Encoding")
 		//if foundHeader(contentEncodings) {
-		if strings.Contains(c.Request.Header.Get("Accept-Encoding"), "gzip") {
+		if strings.Contains(c.Request.Header.Get("Content-Encoding"), "gzip") {
 			compressReader, err := gzip.NewReader(c.Request.Body)
 			if err != nil {
 				log.Fatalf("error: new reader: %d", err)
