@@ -34,8 +34,14 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 	var decoderBody Request
 	decoder := json.NewDecoder(c.Request.Body)
 	err := decoder.Decode(&decoderBody)
+	c.Header("Content-Type", "application/json")
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
+		errorMassage := map[string]interface{}{
+			"message": "Failed to read request body",
+			"code":    http.StatusInternalServerError,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
 	url := strings.TrimSpace(decoderBody.URL)
@@ -44,11 +50,14 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 	StructPerformance := Response{Result: shortURL}
 	respJSON, err := json.Marshal(StructPerformance)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
+		errorMassage := map[string]interface{}{
+			"message": "Failed to read request body",
+			"code":    http.StatusInternalServerError,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
-
-	c.Header("Content-Type", "application/json")
 	c.Data(http.StatusCreated, "application/json", respJSON)
 }
 
