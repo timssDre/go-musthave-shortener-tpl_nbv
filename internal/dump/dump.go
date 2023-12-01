@@ -26,6 +26,7 @@ func FillFromStorage(storageInstance *storage.Storage, filePath string) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 	newDecoder := json.NewDecoder(file)
 	maxUUID := 0
 	for {
@@ -46,6 +47,7 @@ func FillFromStorage(storageInstance *storage.Storage, filePath string) error {
 
 func Set(storageInstance *storage.Storage, filePath string, BaseURL string) error {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
+	defer file.Close()
 	maxUUID := 0
 	for key, value := range storageInstance.URLs {
 		shortURL := fmt.Sprintf("%s/%s", BaseURL, key)

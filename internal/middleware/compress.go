@@ -24,9 +24,9 @@ func CompressMiddleware() gin.HandlerFunc {
 		if c.Request.Header.Get("Content-Type") == "application/json" ||
 			c.Request.Header.Get("Content-Type") == "text/html" {
 
-			acceptEncodings := c.Request.Header.Values("Accept-Encoding")
-
-			if foundHeader(acceptEncodings) {
+			//acceptEncodings := c.Request.Header.Values("Accept-Encoding")
+			//if foundHeader(acceptEncodings)  {
+			if strings.Contains(c.Request.Header.Get("Accept-Encoding"), "gzip") {
 				compressWriter := gzip.NewWriter(c.Writer)
 				defer compressWriter.Close()
 				c.Header("Content-Encoding", "gzip")
@@ -34,8 +34,9 @@ func CompressMiddleware() gin.HandlerFunc {
 			}
 		}
 
-		contentEncodings := c.Request.Header.Values("Content-Encoding")
-		if foundHeader(contentEncodings) {
+		//contentEncodings := c.Request.Header.Values("Content-Encoding")
+		//if foundHeader(contentEncodings) {
+		if strings.Contains(c.Request.Header.Get("Accept-Encoding"), "gzip") {
 			compressReader, err := gzip.NewReader(c.Request.Body)
 			if err != nil {
 				log.Fatalf("error: new reader: %d", err)
@@ -56,12 +57,12 @@ func CompressMiddleware() gin.HandlerFunc {
 	}
 }
 
-func foundHeader(content []string) bool {
-	for _, v := range content {
-		if strings.Contains(v, "gzip") {
-			return true
-		}
-	}
-
-	return false
-}
+//func foundHeader(content []string) bool {
+//	for _, v := range content {
+//		if strings.Contains(v, "gzip") {
+//			return true
+//		}
+//	}
+//
+//	return false
+//}
