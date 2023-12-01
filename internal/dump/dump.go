@@ -47,6 +47,9 @@ func FillFromStorage(storageInstance *storage.Storage, filePath string) error {
 
 func Set(storageInstance *storage.Storage, filePath string, BaseURL string) error {
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
 	defer file.Close()
 	maxUUID := 0
 	for key, value := range storageInstance.URLs {
