@@ -3,14 +3,39 @@ package app
 import (
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/api"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/config"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/dump"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
+	"log"
 )
 
-func Start(config *config.Config) {
-	storageInstance := storage.NewStorage()
+type App struct {
+	storageInstance *storage.Storage
+	config          *config.Config
+}
 
-	err := api.StartRestAPI(config.ServerAddr, config.BaseURL, storageInstance)
-	if err != nil {
-		panic(err)
+func NewApp(storageInstance *storage.Storage, config *config.Config) *App {
+	return &App{
+		storageInstance: storageInstance,
+		config:          config,
 	}
+}
+
+func (a *App) Start() {
+	err := dump.FillFromStorage(a.storageInstance, a.config.FilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = api.StartRestAPI(a.config.ServerAddr, a.config.BaseURL, a.config.LogLevel, a.storageInstance)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (a *App) Stop() {
+	err := dump.Set(a.storageInstance, a.config.FilePath, a.config.BaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
