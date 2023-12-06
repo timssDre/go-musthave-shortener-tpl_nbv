@@ -26,7 +26,7 @@ func (a *App) Start() {
 		log.Fatal(err)
 	}
 
-	err = api.StartRestAPI(a.config.ServerAddr, a.config.BaseURL, a.config.LogLevel, a.config.DbPath, a.storageInstance)
+	err = api.StartRestAPI(a.config.ServerAddr, a.config.BaseURL, a.config.LogLevel, a.config.DBPath, a.storageInstance)
 	if err != nil {
 		log.Fatal(err)
 	}
