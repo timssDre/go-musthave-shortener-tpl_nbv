@@ -45,6 +45,6 @@ func (s *ShortenerService) Get(shortID string) (string, bool) {
 	return s.Storage.Get(shortID)
 }
 
-func (s *ShortenerService) PingStore() error {
+func (s *ShortenerService) Ping() error {
 	return s.bd.PingStore()
 }

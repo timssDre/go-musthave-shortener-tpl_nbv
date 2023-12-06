@@ -73,7 +73,7 @@ func (s *RestAPI) RedirectToOriginalURL(c *gin.Context) {
 }
 
 func (s *RestAPI) Ping(ctx *gin.Context) {
-	err := s.StructService.PingStore()
+	err := s.StructService.Ping()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, "")
 		return
