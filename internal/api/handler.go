@@ -71,3 +71,13 @@ func (s *RestAPI) RedirectToOriginalURL(c *gin.Context) {
 	c.Header("Location", originalURL)
 	c.String(http.StatusTemporaryRedirect, originalURL)
 }
+
+func (s *RestAPI) Ping(ctx *gin.Context) {
+	err := s.StructService.PingStore()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "")
+}

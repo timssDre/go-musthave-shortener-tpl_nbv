@@ -8,6 +8,7 @@ import (
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/middleware"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/store"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
@@ -20,13 +21,18 @@ type RestAPI struct {
 	StructService *services.ShortenerService
 }
 
-func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, storage *storage.Storage) error {
+func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, DbPath string, storage *storage.Storage) error {
 	if err := logger.Initialize(LogLevel); err != nil {
 		return err
 	}
 	logger.Log.Info("Running server", zap.String("address", ServerAddr))
 
-	storageShortener := services.NewShortenerService(BaseURL, storage)
+	bd, err := store.InitDatabase(DbPath)
+	if err != nil {
+		return err
+	}
+	storageShortener := services.NewShortenerService(BaseURL, storage, bd)
+
 	api := &RestAPI{
 		StructService: storageShortener,
 	}

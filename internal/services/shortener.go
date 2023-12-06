@@ -5,6 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type Store interface {
+	PingStore() error
+}
+
 type Repository interface {
 	Set(shortID string, originalURL string)
 	Get(shortID string) (string, bool)
@@ -13,12 +17,14 @@ type Repository interface {
 type ShortenerService struct {
 	BaseURL string
 	Storage Repository
+	bd      Store
 }
 
-func NewShortenerService(BaseURL string, storage Repository) *ShortenerService {
+func NewShortenerService(BaseURL string, storage Repository, bd Store) *ShortenerService {
 	s := &ShortenerService{
 		BaseURL: BaseURL,
 		Storage: storage,
+		bd:      bd,
 	}
 	return s
 }
@@ -37,4 +43,8 @@ func randSeq() string {
 
 func (s *ShortenerService) Get(shortID string) (string, bool) {
 	return s.Storage.Get(shortID)
+}
+
+func (s *ShortenerService) PingStore() error {
+	return s.bd.PingStore()
 }
