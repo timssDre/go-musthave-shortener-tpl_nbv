@@ -60,7 +60,6 @@ func (s *StoreDB) Get(shortURL string) (string, error) {
 func (s *StoreDB) PingStore() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-
 	if err := s.db.PingContext(ctx); err != nil {
 		return fmt.Errorf("pinging db-store: %w", err)
 	}
