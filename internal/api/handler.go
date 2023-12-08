@@ -78,6 +78,5 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, "")
 		return
 	}
-
 	ctx.JSON(http.StatusOK, "")
 }
