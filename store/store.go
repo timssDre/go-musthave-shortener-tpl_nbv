@@ -31,10 +31,10 @@ func (s *StoreDB) Create(originalURL, shortURL string) error {
     `
 	_, err := s.db.Exec(query, shortURL, originalURL)
 	if err != nil {
-		fmt.Println("error save URL: %v", err)
+		//fmt.Println("error save URL: %s", err)
 		return err
 	}
-	fmt.Println("URL save")
+	//fmt.Println("URL save")
 	return nil
 }
 
