@@ -17,8 +17,8 @@ type Config struct {
 
 func InitConfig() *Config {
 	config := &Config{
-		ServerAddr:  "localhost:8081",
-		BaseURL:     "http://localhost:8081",
+		ServerAddr:  "localhost:8080",
+		BaseURL:     "http://localhost:8080",
 		LogLevel:    "info",
 		FilePath:    "short-url-db.json",
 		DBPath:      fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "localhost", 5432, "postgres", "nbvpass", "postgres"),

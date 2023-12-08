@@ -29,7 +29,7 @@ func (a *App) Start() {
 	}
 	dbDNSTurn := true
 	if a.config.DataBaseDSN == "" {
-		err := dump.FillFromStorage(a.storageInstance, a.config.FilePath)
+		err = dump.FillFromStorage(a.storageInstance, a.config.FilePath)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -53,7 +53,8 @@ func Set(storageInstance *storage.Storage, filePath string, BaseURL string) erro
 	defer file.Close()
 	maxUUID := 0
 	for key, value := range storageInstance.URLs {
-		shortURL := fmt.Sprintf("%s/%s", BaseURL, key)
+		//shortURL := fmt.Sprintf("%s/%s", BaseURL, key)
+		shortURL := key
 		maxUUID += 1
 		ShortCollector := ShortCollector{
 			strconv.Itoa(maxUUID),
