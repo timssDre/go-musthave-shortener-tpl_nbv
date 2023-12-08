@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"net/http"
 	"time"
 )
 
@@ -47,15 +46,11 @@ func (s *StoreDB) Get(shortURL string) (string, error) {
     `
 
 	var originalURL string
-	// Выполнение запроса к базе данных
 	err := s.db.QueryRow(query, shortURL).Scan(&originalURL)
 	if err != nil {
-		// Обработка ошибки при выборке данных
 		if err == sql.ErrNoRows {
-			fmt.Println("short URL not fund", http.StatusNotFound)
 			return "", err
 		}
-		fmt.Println(fmt.Sprintf("Ошибка при извлечении URL: %v", err), http.StatusInternalServerError)
 		return "", err
 	}
 
