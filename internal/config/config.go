@@ -28,10 +28,8 @@ func InitConfig() *Config {
 	flag.StringVar(&config.ServerAddr, "a", config.ServerAddr, "address and port to run api")
 	flag.StringVar(&config.BaseURL, "b", config.BaseURL, "address and port to run api addrResPos")
 	flag.StringVar(&config.LogLevel, "c", config.LogLevel, "log level")
-	flag.StringVar(&config.DataBaseDSN, "e", config.DataBaseDSN, "address to base store in-memory")
-	flag.StringVar(&config.DBPath, "d", config.DBPath, "address to base store in-memory")
-	//flag.StringVar(&config.DataBaseDSN, "d", config.DataBaseDSN, "address to base store in-memory")
-	//flag.StringVar(&config.DBPath, "e", config.DBPath, "address to base store in-memory")
+	flag.StringVar(&config.DataBaseDSN, "d", config.DataBaseDSN, "address to base store in-memory")
+	flag.StringVar(&config.DBPath, "e", config.DBPath, "address to base store in-memory")
 	flag.StringVar(&config.FilePath, "f", config.FilePath, "address to file in-memory")
 
 	flag.Parse()

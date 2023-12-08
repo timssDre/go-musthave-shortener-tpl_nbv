@@ -18,6 +18,11 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 		return nil, fmt.Errorf("error opening db: %w", err)
 	}
 
+	err = createTable(db)
+	if err != nil {
+		return nil, fmt.Errorf("error creae table db: %w", err)
+	}
+
 	storeDB := new(StoreDB)
 	storeDB.db = db
 
@@ -35,6 +40,22 @@ func (s *StoreDB) Create(originalURL, shortURL string) error {
 		return err
 	}
 	//fmt.Println("URL save")
+	return nil
+}
+
+func createTable(db *sql.DB) error {
+	query := `CREATE TABLE IF NOT EXISTS urls (
+		id SERIAL PRIMARY KEY,
+		short_id VARCHAR(256) NOT NULL UNIQUE,
+		original_url TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`
+
+	_, err := db.Exec(query)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
