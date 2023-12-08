@@ -59,8 +59,6 @@ func (s *StoreDB) Get(shortURL string) (string, error) {
 		return "", err
 	}
 
-	// Отправка оригинального URL в ответе
-	fmt.Println("original URL: %s", originalURL)
 	return originalURL, err
 }
 
