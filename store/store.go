@@ -18,13 +18,15 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 		return nil, fmt.Errorf("error opening db: %w", err)
 	}
 
-	//err = createTable(db)
-	//if err != nil {
-	//	return nil, fmt.Errorf("error creae table db: %w", err)
-	//}
-
 	storeDB := new(StoreDB)
 	storeDB.db = db
+
+	if DatabasePath != "" {
+		err = createTable(db)
+		if err != nil {
+			return nil, fmt.Errorf("error creae table db: %w", err)
+		}
+	}
 
 	return storeDB, nil
 }
@@ -36,8 +38,7 @@ func (s *StoreDB) Create(originalURL, shortURL string) error {
     `
 	_, err := s.db.Exec(query, shortURL, originalURL)
 	if err != nil {
-		//fmt.Println("error save URL: %s", err)
-		return err
+		return fmt.Errorf("error save URL: %w", err)
 	}
 	//fmt.Println("URL save")
 	return nil
