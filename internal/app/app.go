@@ -1,12 +1,13 @@
 package app
 
 import (
+	"log"
+
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/api"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/config"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/dump"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/store"
-	"log"
 )
 
 type App struct {
@@ -22,7 +23,6 @@ func NewApp(storageInstance *storage.Storage, config *config.Config) *App {
 }
 
 func (a *App) Start() {
-
 	db, err := store.InitDatabase(a.config.DBPath)
 	if err != nil {
 		log.Fatal(err)
