@@ -18,10 +18,10 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 		return nil, fmt.Errorf("error opening db: %w", err)
 	}
 
-	err = createTable(db)
-	if err != nil {
-		return nil, fmt.Errorf("error creae table db: %w", err)
-	}
+	//err = createTable(db)
+	//if err != nil {
+	//	return nil, fmt.Errorf("error creae table db: %w", err)
+	//}
 
 	storeDB := new(StoreDB)
 	storeDB.db = db
