@@ -3,11 +3,11 @@ package app
 import (
 	"log"
 
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/Repository"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/api"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/config"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/dump"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/repository"
 )
 
 type App struct {
