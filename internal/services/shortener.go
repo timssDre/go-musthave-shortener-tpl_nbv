@@ -40,7 +40,8 @@ func (s *ShortenerService) GetExistURL(originalURL string, err error) (string, e
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 		shortID, err := s.GetRep("", originalURL)
-		return shortID, err
+		shortURL := fmt.Sprintf("%s/%s", s.BaseURL, shortID)
+		return shortURL, err
 	}
 	return "", err
 }
