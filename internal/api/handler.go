@@ -34,8 +34,11 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 		return
 	}
 	url := strings.TrimSpace(string(body))
-	shortURL := s.StructService.Set(url)
-
+	shortURL, err := s.StructService.Set(url)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "the url could not be shortened", http.StatusInternalServerError)
+		return
+	}
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
 }
@@ -55,7 +58,16 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 		return
 	}
 	url := strings.TrimSpace(decoderBody.URL)
-	shortURL := s.StructService.Set(url)
+	shortURL, err := s.StructService.Set(url)
+	if err != nil {
+		errorMassage := map[string]interface{}{
+			"message": "the url could not be shortened",
+			"code":    http.StatusInternalServerError,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		c.Data(http.StatusInternalServerError, "application/json", answer)
+		return
+	}
 
 	StructPerformance := Response{Result: shortURL}
 	respJSON, err := json.Marshal(StructPerformance)
@@ -99,7 +111,16 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 	var URLResponses []ResponseBodyURLs
 	for _, req := range decoderBody {
 		url := strings.TrimSpace(req.OriginalURL)
-		shortURL := s.StructService.Set(url)
+		shortURL, err := s.StructService.Set(url)
+		if err != nil {
+			errorMassage := map[string]interface{}{
+				"message": "the url could not be shortened",
+				"code":    http.StatusInternalServerError,
+			}
+			answer, _ := json.Marshal(errorMassage)
+			c.Data(http.StatusInternalServerError, "application/json", answer)
+			return
+		}
 		urlResponse := ResponseBodyURLs{
 			req.CorrelationID,
 			shortURL,

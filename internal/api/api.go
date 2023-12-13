@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/Repository"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/logger"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/middleware"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/store"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
@@ -21,7 +21,7 @@ type RestAPI struct {
 	StructService *services.ShortenerService
 }
 
-func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *store.StoreDB, dbDNSTurn bool, storage *storage.Storage) error {
+func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *Repository.StoreDB, dbDNSTurn bool, storage *storage.Storage) error {
 	if err := logger.Initialize(LogLevel); err != nil {
 		return err
 	}

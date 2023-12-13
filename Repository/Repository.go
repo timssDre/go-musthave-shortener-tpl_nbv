@@ -1,4 +1,4 @@
-package store
+package Repository
 
 import (
 	"context"
@@ -38,9 +38,8 @@ func (s *StoreDB) Create(originalURL, shortURL string) error {
     `
 	_, err := s.db.Exec(query, shortURL, originalURL)
 	if err != nil {
-		return fmt.Errorf("error save URL: %w", err)
+		return err
 	}
-	//fmt.Println("URL save")
 	return nil
 }
 
@@ -50,7 +49,13 @@ func createTable(db *sql.DB) error {
 		short_id VARCHAR(256) NOT NULL UNIQUE,
 		original_url TEXT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`
+	);
+	DO $$ 
+	BEGIN 
+   	 IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE tablename = 'urls' AND indexname = 'idx_original_url') THEN
+        CREATE UNIQUE INDEX idx_original_url ON urls(original_url);
+    END IF;
+	END $$;`
 
 	_, err := db.Exec(query)
 	if err != nil {
@@ -60,15 +65,24 @@ func createTable(db *sql.DB) error {
 	return nil
 }
 
-func (s *StoreDB) Get(shortURL string) (string, error) {
-	query := `
-        SELECT original_url 
-        FROM urls 
-        WHERE short_id = $1
-    `
+func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
+	field1 := "original_url"
+	field2 := "short_id"
+	field := shortURL
+	if shortURL == "" {
+		field2 = "original_url"
+		field1 = "short_id"
+		field = originalURL
+	}
 
-	var originalURL string
-	err := s.db.QueryRow(query, shortURL).Scan(&originalURL)
+	query := fmt.Sprintf(`
+        SELECT %s 
+        FROM urls 
+        WHERE %s = $1
+    `, field1, field2)
+
+	var answer string
+	err := s.db.QueryRow(query, field).Scan(&answer)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", err
@@ -76,7 +90,7 @@ func (s *StoreDB) Get(shortURL string) (string, error) {
 		return "", err
 	}
 
-	return originalURL, err
+	return answer, err
 }
 
 func (s *StoreDB) PingStore() error {

@@ -22,8 +22,6 @@ func InitConfig() *Config {
 		DBPath:     "",
 	}
 
-	//fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "localhost", 5432, "postgres", "nbvpass", "postgres")
-
 	flag.StringVar(&config.ServerAddr, "a", config.ServerAddr, "address and port to run api")
 	flag.StringVar(&config.BaseURL, "b", config.BaseURL, "address and port to run api addrResPos")
 	flag.StringVar(&config.LogLevel, "c", config.LogLevel, "log level")
@@ -31,6 +29,9 @@ func InitConfig() *Config {
 	flag.StringVar(&config.DBPath, "d", config.DBPath, "address to base store in-memory")
 
 	flag.Parse()
+
+	//config.DBPath = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "localhost", 5432, "postgres", "nbvpass", "postgres")
+
 	err := env.Parse(config)
 	if err != nil {
 		panic(err)
