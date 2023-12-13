@@ -36,7 +36,7 @@ func NewShortenerService(BaseURL string, storage Repository, db Store, dbDNSTurn
 	return s
 }
 
-func (s *ShortenerService) GetExistUrl(originalURL string, err error) (string, error) {
+func (s *ShortenerService) GetExistURL(originalURL string, err error) (string, error) {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 		shortID, err := s.GetRep("", originalURL)

@@ -37,7 +37,7 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	url := strings.TrimSpace(string(body))
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
-		shortURL, err = s.StructService.GetExistUrl(url, err)
+		shortURL, err = s.StructService.GetExistURL(url, err)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "the url could not be shortened", http.StatusInternalServerError)
 			return
@@ -66,7 +66,7 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 	url := strings.TrimSpace(decoderBody.URL)
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
-		shortURL, err = s.StructService.GetExistUrl(url, err)
+		shortURL, err = s.StructService.GetExistURL(url, err)
 		if err != nil {
 			errorMassage := map[string]interface{}{
 				"message": "the url could not be shortened",
@@ -124,8 +124,8 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 		url := strings.TrimSpace(req.OriginalURL)
 		shortURL, err := s.StructService.Set(url)
 		if err != nil {
+			shortURL, err = s.StructService.GetExistURL(url, err)
 			if err != nil {
-				shortURL, err = s.StructService.GetExistUrl(url, err)
 				errorMassage := map[string]interface{}{
 					"message": "the url could not be shortened",
 					"code":    http.StatusInternalServerError,
