@@ -23,7 +23,7 @@ func NewApp(storageInstance *storage.Storage, config *config.Config) *App {
 }
 
 func (a *App) Start() {
-	db, err := Repository.InitDatabase(a.config.DBPath)
+	db, err := repository.InitDatabase(a.config.DBPath)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -21,7 +21,7 @@ type RestAPI struct {
 	StructService *services.ShortenerService
 }
 
-func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *Repository.StoreDB, dbDNSTurn bool, storage *storage.Storage) error {
+func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *repository.StoreDB, dbDNSTurn bool, storage *storage.Storage) error {
 	if err := logger.Initialize(LogLevel); err != nil {
 		return err
 	}
