@@ -28,7 +28,7 @@ func (a *App) Start() {
 		log.Fatal(err)
 	}
 	dbDNSTurn := true
-	if a.config.DBPath == "" {
+	if a.UseDatabase() {
 		err = dump.FillFromStorage(a.storageInstance, a.config.FilePath)
 		if err != nil {
 			log.Fatal(err)
@@ -42,8 +42,12 @@ func (a *App) Start() {
 	}
 }
 
+func (a *App) UseDatabase() bool {
+	return a.config.DBPath == ""
+}
+
 func (a *App) Stop() {
-	if a.config.DBPath == "" {
+	if a.UseDatabase() {
 		err := dump.Set(a.storageInstance, a.config.FilePath, a.config.BaseURL)
 		if err != nil {
 			log.Fatal(err)

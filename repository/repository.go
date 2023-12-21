@@ -31,12 +31,12 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 	return storeDB, nil
 }
 
-func (s *StoreDB) Create(originalURL, shortURL string) error {
+func (s *StoreDB) Create(originalURL, shortURL, UserID string) error {
 	query := `
-        INSERT INTO urls (short_id, original_url) 
-        VALUES ($1, $2)
+        INSERT INTO urls (short_id, original_url, userID) 
+        VALUES ($1, $2, $3)
     `
-	_, err := s.db.Exec(query, shortURL, originalURL)
+	_, err := s.db.Exec(query, shortURL, originalURL, UserID)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,8 @@ func createTable(db *sql.DB) error {
 		id SERIAL PRIMARY KEY,
 		short_id VARCHAR(256) NOT NULL UNIQUE,
 		original_url TEXT NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    	userID VARCHAR(36)
 	);
 	DO $$ 
 	BEGIN 
@@ -63,6 +64,26 @@ func createTable(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func (s *StoreDB) GetFull(userID string) ([]map[string]string, error) {
+	query := fmt.Sprintf(`SELECT short_id,original_url FROM urls WHERE userID = $1`)
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		return nil, err // Вернуть ошибку, если запрос не удался
+	}
+	defer rows.Close()
+	urls := []map[string]string{}
+	for rows.Next() {
+		var short_id, original_url string
+		err = rows.Scan(&short_id, &original_url)
+		if err != nil {
+			return urls, nil
+		}
+		urlMap := map[string]string{"short_id": short_id, "original_url": original_url}
+		urls = append(urls, urlMap)
+	}
+	return urls, nil
 }
 
 func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {

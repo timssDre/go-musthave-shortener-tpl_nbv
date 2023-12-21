@@ -39,6 +39,7 @@ func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *repository.St
 		gin.Recovery(),
 		middleware.LoggerMiddleware(logger.Log),
 		middleware.CompressMiddleware(),
+		middleware.AuthorizationMiddleware(),
 	)
 
 	api.setRoutes(r)

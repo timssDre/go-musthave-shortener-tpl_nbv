@@ -34,6 +34,10 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	url := strings.TrimSpace(string(body))
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
@@ -63,6 +67,11 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
+
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	url := strings.TrimSpace(decoderBody.URL)
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
@@ -119,6 +128,11 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
+
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	var URLResponses []ResponseBodyURLs
 	for _, req := range decoderBody {
 		url := strings.TrimSpace(req.OriginalURL)
@@ -163,4 +177,41 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, "")
+}
+
+func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
+	userIDFromContext, _ := ctx.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+	urls, err := s.StructService.GetFullRep()
+	if err != nil {
+		errorMassage := map[string]interface{}{
+			"message": "Failed to retrieve user URLs",
+			"code":    http.StatusInternalServerError,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		ctx.Data(http.StatusInternalServerError, "application/json", answer)
+		return
+	}
+	if len(urls) == 0 {
+		errorMassage := map[string]interface{}{
+			"message": "empty",
+			"code":    http.StatusNoContent,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		ctx.Data(http.StatusNoContent, "application/json", answer)
+	}
+
+	respJSON, err := json.Marshal(urls)
+	if err != nil {
+		errorMassage := map[string]interface{}{
+			"message": "Failed to marshal response",
+			"code":    http.StatusInternalServerError,
+		}
+		answer, _ := json.Marshal(errorMassage)
+		ctx.Data(http.StatusInternalServerError, "application/json", answer)
+		return
+	}
+
+	ctx.Data(http.StatusOK, "application/json", respJSON)
 }
