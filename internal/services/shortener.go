@@ -12,7 +12,7 @@ type Store interface {
 	PingStore() error
 	Create(originalURL, shortURL, UserID string) error
 	Get(shortIrl string, originalURL string) (string, error)
-	GetFull(userID string) ([]map[string]string, error)
+	GetFull(userID string, BaseURL string) ([]map[string]string, error)
 }
 
 type Repository interface {
@@ -92,5 +92,5 @@ func (s *ShortenerService) GetRep(shortURL, originalURL string) (string, error) 
 }
 
 func (s *ShortenerService) GetFullRep() ([]map[string]string, error) {
-	return s.db.GetFull(s.UserID)
+	return s.db.GetFull(s.UserID, s.BaseURL)
 }
