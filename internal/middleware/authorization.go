@@ -14,11 +14,12 @@ type Claims struct {
 	UserID int
 }
 
-const TOKEN_EXP = time.Hour * 3
-const SECRET_KEY = "supersecretkey"
+const TOKENEXP = time.Hour * 3
+const SECRETKEY = "supersecretkey"
 
 func AuthorizationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		userID, err := getUserIDFromCookie(c)
 		if err != nil {
 			code := http.StatusBadRequest
@@ -26,9 +27,6 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 				code = http.StatusUnauthorized
 			}
 			contentType := c.Request.Header.Get("Content-Type")
-			if contentType == "text/plain" {
-				c.String(code, "Unauthorized")
-			}
 			if contentType == "application/json" {
 				errorMassage := map[string]interface{}{
 					"message": "Unauthorized",
@@ -36,6 +34,8 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 				}
 				answer, _ := json.Marshal(errorMassage)
 				c.Data(code, "application/json", answer)
+			} else {
+				c.String(code, "Unauthorized")
 			}
 			c.Abort()
 			return
@@ -44,16 +44,21 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 	}
 }
 
-func getUserIDFromCookie(ctx *gin.Context) (string, error) {
-	userID, err := ctx.Cookie("userID")
+func getUserIDFromCookie(c *gin.Context) (string, error) {
+	userID, err := c.Cookie("userID")
 
 	if err != nil {
-		newUserID, err := BuildJWTString()
+		if c.Request.RequestURI == "/api/user/urls" {
+			return "", err
+		}
+		var newUserID string
+		newUserID, err = BuildJWTString()
 		if err != nil {
 			return "", err
 		}
-		ctx.SetCookie("userID", newUserID, 3600, "/", "localhost", false, true)
-		return "", err
+		c.SetCookie("userID", newUserID, 3600, "/", "localhost", false, true)
+		c.Set("userID", newUserID)
+		return newUserID, nil
 	}
 
 	return userID, nil
@@ -64,14 +69,14 @@ func BuildJWTString() (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// когда создан токен
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKEN_EXP)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKENEXP)),
 		},
 		// собственное утверждение
 		UserID: 2,
 	})
 
 	// создаём строку токена
-	tokenString, err := token.SignedString([]byte(SECRET_KEY))
+	tokenString, err := token.SignedString([]byte(SECRETKEY))
 	if err != nil {
 		return "", err
 	}
