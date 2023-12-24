@@ -232,10 +232,10 @@ func TestRestAPI_UserURLsHandler(t *testing.T) {
 	storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, db, true)
 
 	type argsGet struct {
-		code     int
-		testURL  string
-		location string
-		userID   string
+		code int
+		//testURL  string
+		//location string
+		userID string
 	}
 	testsGET := []struct {
 		name    string
@@ -248,10 +248,10 @@ func TestRestAPI_UserURLsHandler(t *testing.T) {
 				StructService: storageShortener,
 			},
 			argsGet: argsGet{
-				code:     204,
-				testURL:  "ads",
-				location: "https://practicum.yandex.ru/",
-				userID:   "1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDM0NDU3MjEsIlVzZXJJRCI6Mn0.RYi7nFxRQ4kOkNu4uu5zbYxd4H7CmH0uhAeHBIfpQ4g",
+				code: 204,
+				//testURL:  "ads",
+				//location: "https://practicum.yandex.ru/",
+				userID: "1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDM0NDU3MjEsIlVzZXJJRCI6Mn0.RYi7nFxRQ4kOkNu4uu5zbYxd4H7CmH0uhAeHBIfpQ4g",
 			},
 		},
 	}
