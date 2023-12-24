@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/services"
 	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/storage"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/repository"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -218,6 +220,61 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 			defer res.Body.Close()
 			assert.Equal(t, tt.argsGet.code, res.StatusCode)
 			assert.Equal(t, tt.argsGet.location, res.Header.Get("location"))
+		})
+	}
+}
+
+func TestRestAPI_UserURLsHandler(t *testing.T) {
+	storageInstance := storage.NewStorage()
+	DBPath := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"localhost", 5432, "postgres", "nbvpass", "postgres")
+	db, _ := repository.InitDatabase(DBPath)
+	storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, db, true)
+
+	type argsGet struct {
+		code     int
+		testURL  string
+		location string
+		userID   string
+	}
+	testsGET := []struct {
+		name    string
+		Storage RestAPI
+		argsGet argsGet
+	}{
+		{
+			name: "test1",
+			Storage: RestAPI{
+				StructService: storageShortener,
+			},
+			argsGet: argsGet{
+				code:     204,
+				testURL:  "ads",
+				location: "https://practicum.yandex.ru/",
+				userID:   "1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDM0NDU3MjEsIlVzZXJJRCI6Mn0.RYi7nFxRQ4kOkNu4uu5zbYxd4H7CmH0uhAeHBIfpQ4g",
+			},
+		},
+	}
+
+	for _, tt := range testsGET {
+		t.Run(tt.name, func(t *testing.T) {
+			//tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
+
+			r := gin.Default()
+			r.GET("/api/user/urls", func(c *gin.Context) {
+				// Устанавливаем userID в контексте Gin
+				c.Set("userID", tt.argsGet.userID)
+
+				// Вызываем ваш обработчик UserURLsHandler
+				tt.Storage.UserURLsHandler(c)
+			})
+			request := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, request)
+			res := w.Result()
+			defer res.Body.Close()
+			assert.Equal(t, tt.argsGet.code, res.StatusCode)
+			//assert.Equal(t, tt.argsGet.location, res.Header.Get("location"))
 		})
 	}
 }
