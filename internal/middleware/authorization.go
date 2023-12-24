@@ -1,11 +1,8 @@
 package middleware
 
 import (
-	"encoding/json"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"net/http"
 	"time"
 )
 
@@ -20,26 +17,26 @@ const SECRETKEY = "supersecretkey"
 func AuthorizationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		userID, err := getUserIDFromCookie(c)
-		if err != nil {
-			code := http.StatusBadRequest
-			if errors.Is(err, http.ErrNoCookie) {
-				code = http.StatusUnauthorized
-			}
-			contentType := c.Request.Header.Get("Content-Type")
-			if contentType == "application/json" {
-				errorMassage := map[string]interface{}{
-					"message": "Unauthorized",
-					"code":    code,
-				}
-				answer, _ := json.Marshal(errorMassage)
-				c.Data(code, "application/json", answer)
-			} else {
-				c.String(code, "Unauthorized")
-			}
-			c.Abort()
-			return
-		}
+		userID, _ := getUserIDFromCookie(c)
+		//if err != nil {
+		//	code := http.StatusBadRequest
+		//	if errors.Is(err, http.ErrNoCookie) {
+		//		code = http.StatusUnauthorized
+		//	}
+		//	contentType := c.Request.Header.Get("Content-Type")
+		//	if contentType == "application/json" {
+		//		errorMassage := map[string]interface{}{
+		//			"message": "Unauthorized",
+		//			"code":    code,
+		//		}
+		//		answer, _ := json.Marshal(errorMassage)
+		//		c.Data(code, "application/json", answer)
+		//	} else {
+		//		c.String(code, "Unauthorized")
+		//	}
+		//	c.Abort()
+		//	return
+		//}
 		c.Set("userID", userID)
 	}
 }
