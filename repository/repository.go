@@ -49,7 +49,7 @@ func createTable(db *sql.DB) error {
 		short_id VARCHAR(256) NOT NULL UNIQUE,
 		original_url TEXT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    	userID VARCHAR(36)
+    	userID VARCHAR(360)
 	);
 	DO $$ 
 	BEGIN 
@@ -67,10 +67,10 @@ func createTable(db *sql.DB) error {
 }
 
 func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, error) {
-	query := fmt.Sprintf(`SELECT short_id,original_url FROM urls WHERE userID = $1`)
+	query := `SELECT short_id,original_url FROM urls WHERE userID = $1`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
-		return nil, err // Вернуть ошибку, если запрос не удался
+		return nil, err
 	}
 	defer rows.Close()
 	urls := []map[string]string{}
