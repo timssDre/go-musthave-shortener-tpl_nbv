@@ -95,7 +95,12 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
@@ -124,7 +129,12 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
@@ -144,7 +154,12 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 					"message": "the url could not be shortened",
 					"code":    http.StatusInternalServerError,
 				}
-				answer, _ := json.Marshal(errorMassage)
+				var answer []byte
+				answer, err = json.Marshal(errorMassage)
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+					return
+				}
 				c.Data(http.StatusInternalServerError, "application/json", answer)
 				return
 			}
@@ -162,7 +177,12 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
@@ -180,38 +200,63 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 }
 
 func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
+	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
 	userID, _ := userIDFromContext.(string)
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
 	if err != nil {
+		code = http.StatusInternalServerError
 		errorMassage := map[string]interface{}{
 			"message": "Failed to retrieve user URLs",
-			"code":    http.StatusInternalServerError,
+			"code":    code,
 		}
-		answer, _ := json.Marshal(errorMassage)
-		ctx.Data(http.StatusInternalServerError, "application/json", answer)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
+		ctx.Data(code, "application/json", answer)
 		return
 	}
 	if len(urls) == 0 {
+		code = http.StatusNoContent
+		var errorMassages []map[string]interface{}
 		errorMassage := map[string]interface{}{
-			"message": "empty",
-			"code":    http.StatusNoContent,
+			"message": "No URLs found",
+			"code":    code,
 		}
-		answer, _ := json.Marshal(errorMassage)
-		ctx.Data(http.StatusNoContent, "application/json", answer)
+		errorMassages = append(errorMassages, errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassages)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
+		ctx.Data(code, "application/json", answer)
+
+		return
 	}
 
 	respJSON, err := json.Marshal(urls)
 	if err != nil {
+		code = http.StatusInternalServerError
+		var errorMassages []map[string]interface{}
 		errorMassage := map[string]interface{}{
 			"message": "Failed to marshal response",
-			"code":    http.StatusInternalServerError,
+			"code":    code,
 		}
-		answer, _ := json.Marshal(errorMassage)
-		ctx.Data(http.StatusInternalServerError, "application/json", answer)
+		errorMassages = append(errorMassages, errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassages)
+		if err != nil {
+			ctx.AbortWithStatusJSON(code, gin.H{"message": "Internal Server Error"})
+			return
+		}
+		ctx.Data(code, "application/json", answer)
 		return
 	}
 
-	ctx.Data(http.StatusOK, "application/json", respJSON)
+	ctx.Data(code, "application/json", respJSON)
 }

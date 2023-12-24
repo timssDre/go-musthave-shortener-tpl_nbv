@@ -67,13 +67,13 @@ func createTable(db *sql.DB) error {
 }
 
 func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, error) {
+	urls := []map[string]string{}
 	query := `SELECT short_id,original_url FROM urls WHERE userID = $1`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
-		return nil, err
+		return urls, err
 	}
 	defer rows.Close()
-	urls := []map[string]string{}
 	for rows.Next() {
 		var shortID, originalURL string
 		err = rows.Scan(&shortID, &originalURL)

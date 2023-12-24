@@ -28,11 +28,13 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			}
 			contentType := c.Request.Header.Get("Content-Type")
 			if contentType == "application/json" {
+				var errorMassages []map[string]interface{}
 				errorMassage := map[string]interface{}{
 					"message": "Unauthorized",
 					"code":    code,
 				}
-				answer, _ := json.Marshal(errorMassage)
+				errorMassages = append(errorMassages, errorMassage)
+				answer, _ := json.Marshal(errorMassages)
 				c.Data(code, "application/json", answer)
 			} else {
 				c.String(code, "Unauthorized")
