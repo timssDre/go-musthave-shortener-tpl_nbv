@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
@@ -30,14 +31,14 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			if contentType == "application/json" {
 				var errorMassages []map[string]interface{}
 				errorMassage := map[string]interface{}{
-					"message": "Unauthorized",
+					"message": fmt.Sprintf("Unauthorized %s", err),
 					"code":    code,
 				}
 				errorMassages = append(errorMassages, errorMassage)
 				answer, _ := json.Marshal(errorMassages)
 				c.Data(code, "application/json", answer)
 			} else {
-				c.String(code, "Unauthorized")
+				c.String(code, fmt.Sprintf("Unauthorized %s", err))
 			}
 			c.Abort()
 			return
@@ -61,6 +62,11 @@ func getUserIDFromCookie(c *gin.Context) (string, error) {
 		c.SetCookie("userID", newUserID, 3600, "/", "localhost", false, true)
 		c.Set("userID", newUserID)
 		return newUserID, nil
+	} else {
+		_, err = GetUserId(userID)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return userID, nil
@@ -85,4 +91,24 @@ func BuildJWTString() (string, error) {
 
 	// возвращаем строку токена
 	return tokenString, nil
+}
+
+func GetUserId(tokenString string) (int, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			}
+			return []byte(SECRETKEY), nil
+		})
+	if err != nil {
+		return -1, fmt.Errorf("token is not valid")
+	}
+
+	if !token.Valid {
+		return -1, fmt.Errorf("token is not valid")
+	}
+
+	return claims.UserID, nil
 }

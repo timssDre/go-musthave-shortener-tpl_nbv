@@ -67,23 +67,24 @@ func createTable(db *sql.DB) error {
 }
 
 func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, error) {
-	urls := []map[string]string{}
-	query := `SELECT short_id,original_url FROM urls WHERE userID = $1`
+	query := `SELECT short_id, original_url FROM urls WHERE userID = $1`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
-		return urls, err
+		return nil, err
 	}
 	defer rows.Close()
+
+	urls := make([]map[string]string, 0)
 	for rows.Next() {
 		var shortID, originalURL string
-		err = rows.Scan(&shortID, &originalURL)
-		if err != nil {
-			return urls, nil
+		if err = rows.Scan(&shortID, &originalURL); err != nil {
+			return nil, err
 		}
 		shortURL := fmt.Sprintf("%s/%s", BaseURL, shortID)
 		urlMap := map[string]string{"short_id": shortURL, "original_url": originalURL}
 		urls = append(urls, urlMap)
 	}
+
 	return urls, nil
 }
 
@@ -106,9 +107,6 @@ func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
 	var answer string
 	err := s.db.QueryRow(query, field).Scan(&answer)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", err
-		}
 		return "", err
 	}
 
