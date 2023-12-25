@@ -224,11 +224,11 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 
 //func TestRestAPI_UserURLsHandler(t *testing.T) {
 //	storageInstance := storage.NewStorage()
-//	DBPath := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-//		"localhost", 5432, "postgres", "nbvpass", "postgres")
-//	db, _ := repository.InitDatabase(DBPath)
-//	storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, db, true)
-//
+//	//DBPath := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+//	//	"localhost", 5432, "postgres", "nbvpass", "postgres")
+//	//db, _ := repository.InitDatabase(DBPath)
+//	//storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, db, true)
+//	storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, nil, false)
 //	type argsGet struct {
 //		code int
 //		//testURL  string
@@ -247,9 +247,6 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 //			},
 //			argsGet: argsGet{
 //				code: 204,
-//				//testURL:  "ads",
-//				//location: "https://practicum.yandex.ru/",
-//				//userID: "1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDM0NDU3MjEsIlVzZXJJRCI6Mn0.RYi7nFxRQ4kOkNu4uu5zbYxd4H7CmH0uhAeHBIfpQ4g",
 //			},
 //		},
 //	}
@@ -270,7 +267,6 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 //			res := w.Result()
 //			defer res.Body.Close()
 //			assert.Equal(t, tt.argsGet.code, res.StatusCode)
-//			//assert.Equal(t, tt.argsGet.location, res.Header.Get("location"))
 //		})
 //	}
 //}

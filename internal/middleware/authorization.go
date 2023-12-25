@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"net/http"
 	"time"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID int
+	UserID string
 }
 
-const TOKENEXP = time.Hour * 3
+const TOKENEXP = time.Hour * 24
 const SECRETKEY = "supersecretkey"
 
 func AuthorizationMiddleware() gin.HandlerFunc {
@@ -48,7 +49,7 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 }
 
 func getUserIDFromCookie(c *gin.Context) (string, error) {
-	userID, err := c.Cookie("userID")
+	Token, err := c.Cookie("userID")
 
 	if err != nil {
 		if c.Request.RequestURI == "/api/user/urls" {
@@ -62,11 +63,10 @@ func getUserIDFromCookie(c *gin.Context) (string, error) {
 		c.SetCookie("userID", newUserID, 3600, "/", "localhost", false, true)
 		c.Set("userID", newUserID)
 		return newUserID, nil
-	} else {
-		_, err = GetUserID(userID)
-		if err != nil {
-			return "", err
-		}
+	}
+	userID, err := GetUserID(Token)
+	if err != nil {
+		return "", err
 	}
 
 	return userID, nil
@@ -80,7 +80,7 @@ func BuildJWTString() (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKENEXP)),
 		},
 		// собственное утверждение
-		UserID: 2,
+		UserID: uuid.New().String(),
 	})
 
 	// создаём строку токена
@@ -93,7 +93,7 @@ func BuildJWTString() (string, error) {
 	return tokenString, nil
 }
 
-func GetUserID(tokenString string) (int, error) {
+func GetUserID(tokenString string) (string, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(t *jwt.Token) (interface{}, error) {
@@ -103,11 +103,11 @@ func GetUserID(tokenString string) (int, error) {
 			return []byte(SECRETKEY), nil
 		})
 	if err != nil {
-		return -1, fmt.Errorf("token is not valid")
+		return "", fmt.Errorf("token is not valid")
 	}
 
 	if !token.Valid {
-		return -1, fmt.Errorf("token is not valid")
+		return "", fmt.Errorf("token is not valid")
 	}
 
 	return claims.UserID, nil
