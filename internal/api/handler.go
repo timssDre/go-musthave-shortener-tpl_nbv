@@ -203,6 +203,13 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 
 	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
+	new, _ := ctx.Get("new")
+	if new == true {
+		code = http.StatusUnauthorized
+		ctx.JSON(code, nil)
+		return
+	}
+
 	userID, _ := userIDFromContext.(string)
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
@@ -218,10 +225,10 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		return
 	}
 
-	//if len(urls) == 0 {
-	//	ctx.JSON(http.StatusNoContent, nil)
-	//	return
-	//}
+	if len(urls) == 0 {
+		ctx.JSON(http.StatusNoContent, nil)
+		return
+	}
 
 	respJSON, err := json.Marshal(urls)
 	if err != nil {

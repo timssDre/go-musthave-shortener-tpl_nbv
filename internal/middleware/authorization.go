@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	user "github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/users"
 	"net/http"
 	"time"
 )
@@ -21,12 +21,9 @@ const SECRETKEY = "supersecretkey"
 
 func AuthorizationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, err := getUserIDFromCookie(c)
+		UserS, err := getUserIDFromCookie(c)
 		if err != nil {
 			code := http.StatusBadRequest
-			if errors.Is(err, http.ErrNoCookie) {
-				code = http.StatusUnauthorized
-			}
 			contentType := c.Request.Header.Get("Content-Type")
 			if contentType == "application/json" {
 				var errorMassages []map[string]interface{}
@@ -43,29 +40,29 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("userID", userID)
+		c.Set("userID", UserS.ID)
+		c.Set("new", UserS.New)
 	}
 }
 
-func getUserIDFromCookie(c *gin.Context) (string, error) {
-	Token, err := c.Cookie("userID")
-
+func getUserIDFromCookie(c *gin.Context) (*user.User, error) {
+	token, err := c.Cookie("userID")
+	newToken := false
 	if err != nil {
-		var newUserID string
-		newUserID, err = BuildJWTString()
+		token, err = BuildJWTString()
+		newToken = true
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		c.SetCookie("userID", newUserID, 3600, "/", "localhost", false, true)
-		c.Set("userID", newUserID)
-		return newUserID, nil
+		c.SetCookie("userID", token, 3600, "/", "localhost", false, true)
 	}
-	userID, err := GetUserID(Token)
+	userID, err := GetUserID(token)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	UserS := user.NewUser(userID, newToken)
 
-	return userID, nil
+	return UserS, nil
 }
 
 func BuildJWTString() (string, error) {
