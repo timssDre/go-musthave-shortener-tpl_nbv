@@ -36,8 +36,8 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("userID", userInfo.New)
-		c.Set("new", userInfo.Id)
+		c.Set("userID", userInfo.ID)
+		c.Set("new", userInfo.New)
 	}
 }
 
