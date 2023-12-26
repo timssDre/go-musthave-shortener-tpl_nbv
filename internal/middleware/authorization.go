@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	user "github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/users"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/users"
 	"net/http"
 	"time"
 )
