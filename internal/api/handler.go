@@ -209,31 +209,28 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 
 	if err != nil {
 		code = http.StatusInternalServerError
-		errorMassage := map[string]interface{}{
+
+		ctx.Header("Content-type", "application/json")
+		ctx.JSON(code, gin.H{
 			"message": "Failed to retrieve user URLs",
 			"code":    code,
-		}
-		ctx.Header("Content-type", "application/json")
-		ctx.JSON(code, errorMassage)
+		})
 		return
 	}
 
-	if len(urls) == 0 {
-		ctx.JSON(http.StatusNoContent, nil)
-		return
-	}
+	//if len(urls) == 0 {
+	//	ctx.JSON(http.StatusNoContent, nil)
+	//	return
+	//}
 
 	respJSON, err := json.Marshal(urls)
 	if err != nil {
 		code = http.StatusInternalServerError
-		var errorMassages []map[string]interface{}
-		errorMassage := map[string]interface{}{
+		ctx.Header("Content-type", "application/json")
+		ctx.JSON(code, gin.H{
 			"message": "Failed to marshal response",
 			"code":    code,
-		}
-		errorMassages = append(errorMassages, errorMassage)
-		ctx.Header("Content-type", "application/json")
-		ctx.JSON(code, errorMassages)
+		})
 		return
 	}
 
