@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 
@@ -200,11 +201,15 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 }
 
 func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
+
 	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
 	userID, _ := userIDFromContext.(string)
+	fmt.Sprintf(userID)
+
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
+
 	if err != nil {
 		code = http.StatusInternalServerError
 		errorMassage := map[string]interface{}{
@@ -220,22 +225,9 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		ctx.Data(code, "application/json", answer)
 		return
 	}
-	if len(urls) == 0 {
-		code = http.StatusNoContent
-		var errorMassages []map[string]interface{}
-		errorMassage := map[string]interface{}{
-			"message": "No URLs found",
-			"code":    code,
-		}
-		errorMassages = append(errorMassages, errorMassage)
-		var answer []byte
-		answer, err = json.Marshal(errorMassages)
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-			return
-		}
-		ctx.Data(code, "application/json", answer)
 
+	if len(urls) == 0 {
+		ctx.Status(http.StatusNoContent)
 		return
 	}
 
