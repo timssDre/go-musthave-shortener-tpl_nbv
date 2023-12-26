@@ -45,7 +45,7 @@ func getUserIDFromCookie(c *gin.Context) (*user.User, error) {
 	token, err := c.Cookie("userID")
 	newToken := false
 	if err != nil {
-
+		return nil, err
 	}
 	userID, err := GetUserID(token)
 	if err != nil {
