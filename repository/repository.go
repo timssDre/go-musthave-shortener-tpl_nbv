@@ -70,7 +70,7 @@ func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, e
 	query := `SELECT short_id, original_url FROM urls WHERE userID = $1`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get links: %w", err)
 	}
 	defer rows.Close()
 

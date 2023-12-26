@@ -48,7 +48,7 @@ func (a *App) UseDatabase() bool {
 
 func (a *App) Stop() {
 	if a.UseDatabase() {
-		err := dump.Set(a.storageInstance, a.config.FilePath, a.config.BaseURL)
+		err := dump.Set(a.storageInstance, a.config.FilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
