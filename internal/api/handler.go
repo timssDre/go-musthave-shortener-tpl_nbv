@@ -224,13 +224,5 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusNoContent, nil)
 		return
 	}
-	if err != nil {
-		code = http.StatusInternalServerError
-		ctx.JSON(code, gin.H{
-			"message": "Failed to marshal response",
-			"code":    code,
-		})
-		return
-	}
 	ctx.JSON(code, urls)
 }

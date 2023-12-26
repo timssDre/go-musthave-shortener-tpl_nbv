@@ -1,13 +1,13 @@
 package user
 
 type User struct {
-	ID  string
+	Id  string
 	New bool
 }
 
 func NewUser(id string, new bool) *User {
 	return &User{
-		ID:  id,
+		Id:  id,
 		New: new,
 	}
 }
