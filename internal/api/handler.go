@@ -203,8 +203,8 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 
 	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
-	new, _ := ctx.Get("new")
-	if new == true {
+	UserNew, _ := ctx.Get("new")
+	if UserNew == true {
 		code = http.StatusUnauthorized
 		ctx.JSON(code, nil)
 		return
