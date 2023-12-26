@@ -200,7 +200,6 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 }
 
 func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
-
 	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
 	UserNew, _ := ctx.Get("new")
@@ -209,37 +208,30 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		ctx.JSON(code, nil)
 		return
 	}
-
 	userID, _ := userIDFromContext.(string)
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
-
+	ctx.Header("Content-type", "application/json")
 	if err != nil {
 		code = http.StatusInternalServerError
-
-		ctx.Header("Content-type", "application/json")
 		ctx.JSON(code, gin.H{
 			"message": "Failed to retrieve user URLs",
 			"code":    code,
 		})
 		return
 	}
-
 	if len(urls) == 0 {
 		ctx.JSON(http.StatusNoContent, nil)
 		return
 	}
-
 	respJSON, err := json.Marshal(urls)
 	if err != nil {
 		code = http.StatusInternalServerError
-		ctx.Header("Content-type", "application/json")
 		ctx.JSON(code, gin.H{
 			"message": "Failed to marshal response",
 			"code":    code,
 		})
 		return
 	}
-
-	ctx.Data(code, "application/json", respJSON)
+	ctx.JSON(code, respJSON)
 }
