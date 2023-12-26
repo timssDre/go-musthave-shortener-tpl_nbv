@@ -84,6 +84,9 @@ func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, e
 		urlMap := map[string]string{"short_id": shortURL, "original_url": originalURL}
 		urls = append(urls, urlMap)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during iteration through link rows: %w", err)
+	}
 
 	return urls, nil
 }
