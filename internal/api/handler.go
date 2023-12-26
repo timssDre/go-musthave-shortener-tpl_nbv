@@ -224,7 +224,6 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusNoContent, nil)
 		return
 	}
-	respJSON, err := json.Marshal(urls)
 	if err != nil {
 		code = http.StatusInternalServerError
 		ctx.JSON(code, gin.H{
@@ -233,5 +232,5 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(code, respJSON)
+	ctx.JSON(code, urls)
 }

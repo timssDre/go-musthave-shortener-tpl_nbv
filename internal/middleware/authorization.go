@@ -45,7 +45,12 @@ func getUserIDFromCookie(c *gin.Context) (*user.User, error) {
 	token, err := c.Cookie("userID")
 	newToken := false
 	if err != nil {
-		return nil, err
+		token, err = BuildJWTString()
+		newToken = true
+		if err != nil {
+			return nil, err
+		}
+		c.SetCookie("userID", token, 3600, "/", "localhost", false, true)
 	}
 	userID, err := GetUserID(token)
 	if err != nil {
