@@ -21,7 +21,7 @@ const SECRETKEY = "supersecretkey"
 
 func AuthorizationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		UserS, err := getUserIDFromCookie(c)
+		userInfo, err := getUserIDFromCookie(c)
 		if err != nil {
 			code := http.StatusBadRequest
 			contentType := c.Request.Header.Get("Content-Type")
@@ -40,8 +40,8 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("userID", UserS.ID)
-		c.Set("new", UserS.New)
+		c.Set("userID", userInfo.ID)
+		c.Set("new", userInfo.New)
 	}
 }
 
@@ -60,9 +60,9 @@ func getUserIDFromCookie(c *gin.Context) (*user.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	UserS := user.NewUser(userID, newToken)
+	userInfo := user.NewUser(userID, newToken)
 
-	return UserS, nil
+	return userInfo, nil
 }
 
 func BuildJWTString() (string, error) {
