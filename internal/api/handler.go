@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 
@@ -205,8 +204,6 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 	code := http.StatusOK
 	userIDFromContext, _ := ctx.Get("userID")
 	userID, _ := userIDFromContext.(string)
-	fmt.Sprintf(userID)
-
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
 
