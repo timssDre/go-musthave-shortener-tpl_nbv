@@ -213,18 +213,13 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 			"message": "Failed to retrieve user URLs",
 			"code":    code,
 		}
-		var answer []byte
-		answer, err = json.Marshal(errorMassage)
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-			return
-		}
-		ctx.Data(code, "application/json", answer)
+		ctx.Header("Content-type", "application/json")
+		ctx.JSON(code, errorMassage)
 		return
 	}
 
 	if len(urls) == 0 {
-		ctx.Status(http.StatusNoContent)
+		ctx.JSON(http.StatusNoContent, nil)
 		return
 	}
 
@@ -237,13 +232,8 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 			"code":    code,
 		}
 		errorMassages = append(errorMassages, errorMassage)
-		var answer []byte
-		answer, err = json.Marshal(errorMassages)
-		if err != nil {
-			ctx.AbortWithStatusJSON(code, gin.H{"message": "Internal Server Error"})
-			return
-		}
-		ctx.Data(code, "application/json", answer)
+		ctx.Header("Content-type", "application/json")
+		ctx.JSON(code, errorMassages)
 		return
 	}
 
