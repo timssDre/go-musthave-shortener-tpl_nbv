@@ -51,9 +51,9 @@ func getUserIDFromCookie(c *gin.Context) (string, error) {
 	Token, err := c.Cookie("userID")
 
 	if err != nil {
-		if c.Request.RequestURI == "/api/user/urls" {
-			return "", err
-		}
+		//if c.Request.RequestURI == "/api/user/urls" {
+		//	return "", err
+		//}
 		var newUserID string
 		newUserID, err = BuildJWTString()
 		if err != nil {
