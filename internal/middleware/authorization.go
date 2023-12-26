@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -23,17 +22,14 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userInfo, err := getUserIDFromCookie(c)
 		if err != nil {
-			code := http.StatusBadRequest
+			code := http.StatusInternalServerError
 			contentType := c.Request.Header.Get("Content-Type")
 			if contentType == "application/json" {
-				var errorMassages []map[string]interface{}
-				errorMassage := map[string]interface{}{
+				c.Header("Content-Type", "application/json")
+				c.JSON(code, gin.H{
 					"message": fmt.Sprintf("Unauthorized %s", err),
 					"code":    code,
-				}
-				errorMassages = append(errorMassages, errorMassage)
-				answer, _ := json.Marshal(errorMassages)
-				c.Data(code, "application/json", answer)
+				})
 			} else {
 				c.String(code, fmt.Sprintf("Unauthorized %s", err))
 			}
