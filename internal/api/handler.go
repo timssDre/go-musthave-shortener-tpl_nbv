@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
 
@@ -201,7 +202,14 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 
 func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 	code := http.StatusOK
-	userIDFromContext, _ := ctx.Get("userID")
+	userIDFromContext, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to get userID",
+			"error":   errors.New("failed to get user from context").Error(),
+		})
+		return
+	}
 	UserNew, _ := ctx.Get("new")
 	if UserNew == true {
 		code = http.StatusUnauthorized
