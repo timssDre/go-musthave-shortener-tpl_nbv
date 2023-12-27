@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
-
 	"net/http"
 	"strings"
 )
@@ -34,6 +34,10 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	url := strings.TrimSpace(string(body))
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
@@ -63,6 +67,11 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
+
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	url := strings.TrimSpace(decoderBody.URL)
 	shortURL, err := s.StructService.Set(url)
 	if err != nil {
@@ -86,7 +95,12 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
@@ -115,10 +129,20 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
+
+	userIDFromContext, _ := c.Get("userID")
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
 	var URLResponses []ResponseBodyURLs
 	for _, req := range decoderBody {
 		url := strings.TrimSpace(req.OriginalURL)
@@ -130,7 +154,12 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 					"message": "the url could not be shortened",
 					"code":    http.StatusInternalServerError,
 				}
-				answer, _ := json.Marshal(errorMassage)
+				var answer []byte
+				answer, err = json.Marshal(errorMassage)
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+					return
+				}
 				c.Data(http.StatusInternalServerError, "application/json", answer)
 				return
 			}
@@ -148,7 +177,12 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		answer, _ := json.Marshal(errorMassage)
+		var answer []byte
+		answer, err = json.Marshal(errorMassage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+			return
+		}
 		c.Data(http.StatusInternalServerError, "application/json", answer)
 		return
 	}
@@ -163,4 +197,40 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, "")
+}
+
+func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
+	code := http.StatusOK
+	userIDFromContext, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to get userID",
+			"error":   errors.New("failed to get user from context").Error(),
+		})
+		return
+	}
+	UserNew, _ := ctx.Get("new")
+	if UserNew == true {
+		code = http.StatusUnauthorized
+		ctx.JSON(code, nil)
+		return
+	}
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+	urls, err := s.StructService.GetFullRep()
+	ctx.Header("Content-type", "application/json")
+	if err != nil {
+		code = http.StatusInternalServerError
+		ctx.JSON(code, gin.H{
+			"message": "Failed to retrieve user URLs",
+			"code":    code,
+		})
+		return
+	}
+
+	if len(urls) == 0 {
+		ctx.JSON(http.StatusNoContent, nil)
+		return
+	}
+	ctx.JSON(code, urls)
 }

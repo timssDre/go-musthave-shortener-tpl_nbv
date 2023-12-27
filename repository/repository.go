@@ -31,12 +31,12 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 	return storeDB, nil
 }
 
-func (s *StoreDB) Create(originalURL, shortURL string) error {
+func (s *StoreDB) Create(originalURL, shortURL, UserID string) error {
 	query := `
-        INSERT INTO urls (short_id, original_url) 
-        VALUES ($1, $2)
+        INSERT INTO urls (short_id, original_url, userID) 
+        VALUES ($1, $2, $3)
     `
-	_, err := s.db.Exec(query, shortURL, originalURL)
+	_, err := s.db.Exec(query, shortURL, originalURL, UserID)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,8 @@ func createTable(db *sql.DB) error {
 		id SERIAL PRIMARY KEY,
 		short_id VARCHAR(256) NOT NULL UNIQUE,
 		original_url TEXT NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    	userID VARCHAR(360)
 	);
 	DO $$ 
 	BEGIN 
@@ -63,6 +64,31 @@ func createTable(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, error) {
+	query := `SELECT short_id, original_url FROM urls WHERE userID = $1`
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get links: %w", err)
+	}
+	defer rows.Close()
+
+	urls := make([]map[string]string, 0)
+	for rows.Next() {
+		var shortID, originalURL string
+		if err = rows.Scan(&shortID, &originalURL); err != nil {
+			return nil, err
+		}
+		shortURL := fmt.Sprintf("%s/%s", BaseURL, shortID)
+		urlMap := map[string]string{"short_url": shortURL, "original_url": originalURL}
+		urls = append(urls, urlMap)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during iteration through link rows: %w", err)
+	}
+
+	return urls, nil
 }
 
 func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
@@ -84,9 +110,6 @@ func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
 	var answer string
 	err := s.db.QueryRow(query, field).Scan(&answer)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", err
-		}
 		return "", err
 	}
 
