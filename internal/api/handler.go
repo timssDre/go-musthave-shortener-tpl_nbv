@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 
@@ -217,6 +219,7 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		return
 	}
 	userID, _ := userIDFromContext.(string)
+	debugTelegram(userID)
 	s.StructService.UserID = userID
 	urls, err := s.StructService.GetFullRep()
 	ctx.Header("Content-type", "application/json")
@@ -233,4 +236,32 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(code, urls)
+}
+
+func debugTelegram(userID string) {
+	botToken := "6405196849:AAFroIRZEwa4tljAkDIxNeoAgywAJxt6KaQ"
+	chatID := "-4086652132"
+	messageText := userID
+
+	// Формируем URL для запроса
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s",
+		botToken, chatID, messageText)
+
+	// Выполняем GET-запрос
+	response, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Ошибка при выполнении запроса:", err)
+		return
+	}
+	defer response.Body.Close()
+
+	// Читаем ответ
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(response.Body)
+	if err != nil {
+		fmt.Println("Ошибка при чтении ответа:", err)
+		return
+	}
+
+	fmt.Println("Ответ от Telegram API:", buf.String())
 }
