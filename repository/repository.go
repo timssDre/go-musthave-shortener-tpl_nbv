@@ -81,7 +81,7 @@ func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, e
 			return nil, err
 		}
 		shortURL := fmt.Sprintf("%s/%s", BaseURL, shortID)
-		urlMap := map[string]string{"short_id": shortURL, "original_url": originalURL}
+		urlMap := map[string]string{"short_url": shortURL, "original_url": originalURL}
 		urls = append(urls, urlMap)
 	}
 	if err = rows.Err(); err != nil {
