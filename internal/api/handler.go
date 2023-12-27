@@ -227,10 +227,6 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, nil)
-		return
-	}
 
 	if len(urls) == 0 {
 		ctx.JSON(http.StatusNoContent, nil)
