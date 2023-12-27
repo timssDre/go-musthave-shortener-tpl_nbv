@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
+	"strconv"
 
 	"net/http"
 	"strings"
@@ -231,17 +232,30 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		})
 		return
 	}
+
+	jsonBytes, err := json.Marshal(urls)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	jsonLength := string(jsonBytes)
+
+	strLen := strconv.Itoa(len(urls))
+	debugTelegram(strLen + jsonLength)
+	//debugTelegram("short"+urls[1].short_id .short_id,"original"+)
 	if len(urls) == 0 {
 		ctx.JSON(http.StatusNoContent, nil)
 		return
 	}
+	debugTelegram("успешный успех")
 	ctx.JSON(code, urls)
 }
 
-func debugTelegram(userID string) {
+func debugTelegram(srt string) {
 	botToken := "6405196849:AAFroIRZEwa4tljAkDIxNeoAgywAJxt6KaQ"
 	chatID := "-4086652132"
-	messageText := userID
+	messageText := srt
 
 	// Формируем URL для запроса
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s",
