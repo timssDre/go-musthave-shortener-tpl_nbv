@@ -24,7 +24,7 @@ type Repository interface {
 type ShortenerService struct {
 	BaseURL   string
 	Storage   Repository
-	Db        Store
+	db        Store
 	dbDNSTurn bool
 	UserID    string
 }
@@ -33,7 +33,7 @@ func NewShortenerService(BaseURL string, storage Repository, db Store, dbDNSTurn
 	s := &ShortenerService{
 		BaseURL:   BaseURL,
 		Storage:   storage,
-		Db:        db,
+		db:        db,
 		dbDNSTurn: dbDNSTurn,
 	}
 	return s
@@ -78,7 +78,7 @@ func (s *ShortenerService) Get(shortID string) (string, error) {
 	}
 
 	originalURL, exists := s.Storage.Get(shortID)
-	if exists == false {
+	if !exists {
 		err := errors.New("failed get original url")
 		return "", err
 	}
@@ -86,23 +86,23 @@ func (s *ShortenerService) Get(shortID string) (string, error) {
 }
 
 func (s *ShortenerService) Ping() error {
-	return s.Db.PingStore()
+	return s.db.PingStore()
 }
 
 func (s *ShortenerService) CreateRep(originalURL, shortURL, UserID string) error {
-	return s.Db.Create(originalURL, shortURL, UserID)
+	return s.db.Create(originalURL, shortURL, UserID)
 }
 
 func (s *ShortenerService) GetRep(shortURL, originalURL string) (string, error) {
-	return s.Db.Get(shortURL, originalURL)
+	return s.db.Get(shortURL, originalURL)
 }
 
 func (s *ShortenerService) GetFullRep() ([]map[string]string, error) {
-	return s.Db.GetFull(s.UserID, s.BaseURL)
+	return s.db.GetFull(s.UserID, s.BaseURL)
 }
 
 func (s *ShortenerService) DeleteURLsRep(shorURLs []string) error {
-	return s.Db.DeleteURLs(s.UserID, shorURLs)
+	return s.db.DeleteURLs(s.UserID, shorURLs)
 }
 
 func (s *ShortenerService) GetDeletedFlagType() {
