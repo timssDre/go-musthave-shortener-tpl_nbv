@@ -248,7 +248,7 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 }
 
 func (s *RestAPI) DeleteUserUrls(ctx *gin.Context) {
-	code := http.StatusOK
+	code := http.StatusAccepted
 	userIDFromContext, exists := ctx.Get("userID")
 	if !exists {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
