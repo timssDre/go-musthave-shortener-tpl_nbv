@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/logger"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"strings"
@@ -108,14 +110,20 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 }
 
 func (s *RestAPI) RedirectToOriginalURL(c *gin.Context) {
+	code := http.StatusTemporaryRedirect
 	shortID := c.Param("id")
-	originalURL, exists := s.StructService.Get(shortID)
-	if !exists {
-		c.String(http.StatusTemporaryRedirect, "URL not found")
+	originalURL, err := s.StructService.Get(shortID)
+	if err != nil {
+		if err.Error() == http.StatusText(http.StatusGone) {
+			c.Status(http.StatusGone)
+			return
+		}
+		c.String(http.StatusTemporaryRedirect, err.Error())
 		return
 	}
+
 	c.Header("Location", originalURL)
-	c.String(http.StatusTemporaryRedirect, originalURL)
+	c.String(code, originalURL)
 }
 
 func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
@@ -220,6 +228,10 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 	urls, err := s.StructService.GetFullRep()
 	ctx.Header("Content-type", "application/json")
 	if err != nil {
+		if err.Error() == http.StatusText(http.StatusGone) {
+			ctx.Status(http.StatusGone)
+			return
+		}
 		code = http.StatusInternalServerError
 		ctx.JSON(code, gin.H{
 			"message": "Failed to retrieve user URLs",
@@ -233,4 +245,35 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(code, urls)
+}
+
+func (s *RestAPI) DeleteUserUrls(ctx *gin.Context) {
+	code := http.StatusOK
+	userIDFromContext, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to get userID",
+			"error":   errors.New("failed to get user from context").Error(),
+		})
+		return
+	}
+	userID, _ := userIDFromContext.(string)
+	s.StructService.UserID = userID
+
+	var shorURLs []string
+	if err := ctx.BindJSON(&shorURLs); err != nil {
+		code = http.StatusBadRequest
+		ctx.JSON(code, gin.H{
+			"error:": err.Error(),
+		})
+	}
+
+	go func() {
+		err := s.StructService.DeleteURLsRep(shorURLs)
+		if err != nil {
+			logger.Log.Error("Failed to delete URLs", zap.Error(err))
+		}
+	}()
+
+	ctx.Status(code)
 }
