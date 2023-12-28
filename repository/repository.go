@@ -87,7 +87,7 @@ func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, e
 		if err = rows.Scan(&shortID, &originalURL, &deletedFlag); err != nil {
 			return nil, err
 		}
-		if deletedFlag == true {
+		if deletedFlag {
 			err = errors.New(http.StatusText(http.StatusGone))
 			return make([]map[string]string, 0), err
 		}
@@ -143,7 +143,7 @@ func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
 		return "", err
 	}
 
-	if deletedFlag == true {
+	if deletedFlag {
 		err = errors.New(http.StatusText(http.StatusGone))
 		return "", err
 	}
