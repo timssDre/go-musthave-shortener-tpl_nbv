@@ -207,6 +207,12 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		})
 		return
 	}
+	UserNew, _ := ctx.Get("new")
+	if UserNew == true {
+		code = http.StatusUnauthorized
+		ctx.JSON(code, nil)
+		return
+	}
 	userID, _ := userIDFromContext.(string)
 	urls, err := s.StructService.GetFullRep(userID)
 	ctx.Header("Content-type", "application/json")
