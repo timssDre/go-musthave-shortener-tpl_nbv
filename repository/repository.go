@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"net/http"
 	"time"
 )
 
@@ -31,12 +33,12 @@ func InitDatabase(DatabasePath string) (*StoreDB, error) {
 	return storeDB, nil
 }
 
-func (s *StoreDB) Create(originalURL, shortURL string) error {
+func (s *StoreDB) Create(originalURL, shortURL, UserID string) error {
 	query := `
-        INSERT INTO urls (short_id, original_url) 
-        VALUES ($1, $2)
+        INSERT INTO urls (short_id, original_url, userID) 
+        VALUES ($1, $2, $3)
     `
-	_, err := s.db.Exec(query, shortURL, originalURL)
+	_, err := s.db.Exec(query, shortURL, originalURL, UserID)
 	if err != nil {
 		return err
 	}
@@ -48,7 +50,9 @@ func createTable(db *sql.DB) error {
 		id SERIAL PRIMARY KEY,
 		short_id VARCHAR(256) NOT NULL UNIQUE,
 		original_url TEXT NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    	userID VARCHAR(360),
+    	deletedFlag BOOLEAN DEFAULT FALSE
 	);
 	DO $$ 
 	BEGIN 
@@ -65,6 +69,53 @@ func createTable(db *sql.DB) error {
 	return nil
 }
 
+func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, error) {
+	query := `SELECT short_id, original_url, deletedFlag FROM urls WHERE userID = $1`
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get links: %w", err)
+	}
+	defer rows.Close()
+
+	urls := make([]map[string]string, 0)
+	for rows.Next() {
+		var (
+			shortID     string
+			originalURL string
+			deletedFlag bool
+		)
+		if err = rows.Scan(&shortID, &originalURL, &deletedFlag); err != nil {
+			return nil, err
+		}
+		if deletedFlag {
+			err = errors.New(http.StatusText(http.StatusGone))
+			return make([]map[string]string, 0), err
+		}
+		shortURL := fmt.Sprintf("%s/%s", BaseURL, shortID)
+		urlMap := map[string]string{"short_url": shortURL, "original_url": originalURL}
+		urls = append(urls, urlMap)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during iteration through link rows: %w", err)
+	}
+
+	return urls, nil
+}
+
+func (s *StoreDB) DeleteURLs(userID string, shortURL string, updateChan chan<- string) error {
+	query := `
+		UPDATE urls
+		SET deletedFlag = true
+		WHERE short_id = $1 and  userID = $2`
+
+	_, err := s.db.Exec(query, shortURL, userID)
+	if err != nil {
+		return err
+	}
+	updateChan <- shortURL
+	return nil
+}
+
 func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
 	field1 := "original_url"
 	field2 := "short_id"
@@ -76,17 +127,22 @@ func (s *StoreDB) Get(shortURL string, originalURL string) (string, error) {
 	}
 
 	query := fmt.Sprintf(`
-        SELECT %s 
+        SELECT %s, deletedFlag 
         FROM urls 
         WHERE %s = $1
     `, field1, field2)
 
-	var answer string
-	err := s.db.QueryRow(query, field).Scan(&answer)
+	var (
+		answer      string
+		deletedFlag bool
+	)
+	err := s.db.QueryRow(query, field).Scan(&answer, &deletedFlag)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", err
-		}
+		return "", err
+	}
+
+	if deletedFlag {
+		err = errors.New(http.StatusText(http.StatusGone))
 		return "", err
 	}
 
