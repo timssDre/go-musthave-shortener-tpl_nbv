@@ -102,19 +102,17 @@ func (s *StoreDB) GetFull(userID string, BaseURL string) ([]map[string]string, e
 	return urls, nil
 }
 
-func (s *StoreDB) DeleteURLs(userID string, shorURLs []string) error {
-	for _, u := range shorURLs {
-		query := `
-		UPDATE urls 
-		SET deletedFlag = true 
+func (s *StoreDB) DeleteURLs(userID string, shortURL string, updateChan chan<- string) error {
+	query := `
+		UPDATE urls
+		SET deletedFlag = true
 		WHERE short_id = $1 and  userID = $2`
 
-		_, err := s.db.Exec(query, u, userID)
-		if err != nil {
-			return err
-		}
-
+	_, err := s.db.Exec(query, shortURL, userID)
+	if err != nil {
+		return err
 	}
+	updateChan <- shortURL
 	return nil
 }
 

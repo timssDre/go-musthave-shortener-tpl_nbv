@@ -36,8 +36,15 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		if userInfo.New == true {
+			if c.Request.Method == http.MethodGet {
+				code := http.StatusUnauthorized
+				c.JSON(code, nil)
+				c.Abort()
+				return
+			}
+		}
 		c.Set("userID", userInfo.ID)
-		c.Set("new", userInfo.New)
 	}
 }
 

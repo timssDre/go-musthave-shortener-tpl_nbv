@@ -30,9 +30,6 @@ func InitConfig() *Config {
 
 	flag.Parse()
 
-	//config.DBPath = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-	//	"localhost", 5432, "postgres", "nbvpass", "postgres")
-
 	err := env.Parse(config)
 	if err != nil {
 		panic(err)

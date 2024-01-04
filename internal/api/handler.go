@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/timssDre/go-musthave-shortener-tpl_nbv.git/internal/logger"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"strings"
@@ -38,10 +36,9 @@ func (s *RestAPI) ShortenURLHandler(c *gin.Context) {
 	}
 	userIDFromContext, _ := c.Get("userID")
 	userID, _ := userIDFromContext.(string)
-	s.StructService.UserID = userID
 
 	url := strings.TrimSpace(string(body))
-	shortURL, err := s.StructService.Set(url)
+	shortURL, err := s.StructService.Set(userID, url)
 	if err != nil {
 		shortURL, err = s.StructService.GetExistURL(url, err)
 		if err != nil {
@@ -72,10 +69,9 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 
 	userIDFromContext, _ := c.Get("userID")
 	userID, _ := userIDFromContext.(string)
-	s.StructService.UserID = userID
 
 	url := strings.TrimSpace(decoderBody.URL)
-	shortURL, err := s.StructService.Set(url)
+	shortURL, err := s.StructService.Set(userID, url)
 	if err != nil {
 		shortURL, err = s.StructService.GetExistURL(url, err)
 		if err != nil {
@@ -97,13 +93,7 @@ func (s *RestAPI) ShortenURLJSON(c *gin.Context) {
 			"message": "Failed to read request body",
 			"code":    http.StatusInternalServerError,
 		}
-		var answer []byte
-		answer, err = json.Marshal(errorMassage)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
-			return
-		}
-		c.Data(http.StatusInternalServerError, "application/json", answer)
+		c.JSON(http.StatusInternalServerError, errorMassage)
 		return
 	}
 	c.Data(httpStatus, "application/json", respJSON)
@@ -149,12 +139,11 @@ func (s *RestAPI) ShortenURLsJSON(c *gin.Context) {
 
 	userIDFromContext, _ := c.Get("userID")
 	userID, _ := userIDFromContext.(string)
-	s.StructService.UserID = userID
 
 	var URLResponses []ResponseBodyURLs
 	for _, req := range decoderBody {
 		url := strings.TrimSpace(req.OriginalURL)
-		shortURL, err := s.StructService.Set(url)
+		shortURL, err := s.StructService.Set(userID, url)
 		if err != nil {
 			shortURL, err = s.StructService.GetExistURL(url, err)
 			if err != nil {
@@ -210,6 +199,7 @@ func (s *RestAPI) Ping(ctx *gin.Context) {
 func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 	code := http.StatusOK
 	userIDFromContext, exists := ctx.Get("userID")
+	ctx.Request.Context()
 	if !exists {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to get userID",
@@ -217,15 +207,8 @@ func (s *RestAPI) UserURLsHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	UserNew, _ := ctx.Get("new")
-	if UserNew == true {
-		code = http.StatusUnauthorized
-		ctx.JSON(code, nil)
-		return
-	}
 	userID, _ := userIDFromContext.(string)
-	s.StructService.UserID = userID
-	urls, err := s.StructService.GetFullRep()
+	urls, err := s.StructService.GetFullRep(userID)
 	ctx.Header("Content-type", "application/json")
 	if err != nil {
 		if err.Error() == http.StatusText(http.StatusGone) {
@@ -258,7 +241,6 @@ func (s *RestAPI) DeleteUserUrls(ctx *gin.Context) {
 		return
 	}
 	userID, _ := userIDFromContext.(string)
-	s.StructService.UserID = userID
 
 	var shorURLs []string
 	if err := ctx.BindJSON(&shorURLs); err != nil {
@@ -268,12 +250,13 @@ func (s *RestAPI) DeleteUserUrls(ctx *gin.Context) {
 		})
 	}
 
-	go func() {
-		err := s.StructService.DeleteURLsRep(shorURLs)
-		if err != nil {
-			logger.Log.Error("Failed to delete URLs", zap.Error(err))
-		}
-	}()
-
+	err := s.StructService.DeleteURLsRep(userID, shorURLs)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed delete to url",
+			"error":   errors.New("failed to get user from context").Error(),
+		})
+		return
+	}
 	ctx.Status(code)
 }
