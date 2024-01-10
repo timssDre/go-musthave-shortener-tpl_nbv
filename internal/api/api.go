@@ -18,7 +18,7 @@ import (
 )
 
 type RestAPI struct {
-	StructService *services.ShortenerService
+	Shortener *services.ShortenerService
 }
 
 func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *repository.StoreDB, dbDNSTurn bool, storage *storage.Storage) error {
@@ -29,7 +29,7 @@ func StartRestAPI(ServerAddr, BaseURL string, LogLevel string, db *repository.St
 	storageShortener := services.NewShortenerService(BaseURL, storage, db, dbDNSTurn)
 
 	api := &RestAPI{
-		StructService: storageShortener,
+		Shortener: storageShortener,
 	}
 
 	gin.SetMode(gin.ReleaseMode)

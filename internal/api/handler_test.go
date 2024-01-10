@@ -29,7 +29,7 @@ func Test_shortenURLHandler(t *testing.T) {
 		{
 			name: "test1",
 			Storage: RestAPI{
-				StructService: storageShortener,
+				Shortener: storageShortener,
 			},
 			args: args{
 				code:        201,
@@ -77,7 +77,7 @@ func Test_shortenURLHandlerJSON(t *testing.T) {
 		{
 			name: "test1",
 			Storage: RestAPI{
-				StructService: storageShortener,
+				Shortener: storageShortener,
 			},
 			args: args{
 				code:        201,
@@ -134,7 +134,7 @@ func Test_shortenURLsHandlerJSON(t *testing.T) {
 		{
 			name: "test1",
 			Storage: RestAPI{
-				StructService: storageShortener,
+				Shortener: storageShortener,
 			},
 			args: args{
 				code:        201,
@@ -194,7 +194,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 		{
 			name: "test1",
 			Storage: RestAPI{
-				StructService: storageShortener,
+				Shortener: storageShortener,
 			},
 			argsGet: argsGet{
 				code:     307,
@@ -206,7 +206,7 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 
 	for _, tt := range testsGET {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
+			tt.Storage.Shortener.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
 
 			r := gin.Default()
 			r.GET("/:id", tt.Storage.RedirectToOriginalURL)
@@ -221,52 +221,3 @@ func Test_redirectToOriginalURLHandler(t *testing.T) {
 		})
 	}
 }
-
-//func TestRestAPI_UserURLsHandler(t *testing.T) {
-//	storageInstance := storage.NewStorage()
-//	//DBPath := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-//	//	"localhost", 5432, "postgres", "nbvpass", "postgres")
-//	//db, _ := repository.InitDatabase(DBPath)
-//	//storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, db, true)
-//	storageShortener := services.NewShortenerService("http://localhost:8080", storageInstance, nil, false)
-//	type argsGet struct {
-//		code int
-//		//testURL  string
-//		//location string
-//		//userID string
-//	}
-//	testsGET := []struct {
-//		name    string
-//		Storage RestAPI
-//		argsGet argsGet
-//	}{
-//		{
-//			name: "test1",
-//			Storage: RestAPI{
-//				StructService: storageShortener,
-//			},
-//			argsGet: argsGet{
-//				code: 204,
-//			},
-//		},
-//	}
-//
-//	for _, tt := range testsGET {
-//		t.Run(tt.name, func(t *testing.T) {
-//			//tt.Storage.StructService.Storage.Set(tt.argsGet.testURL, tt.argsGet.location)
-//
-//			r := gin.Default()
-//			r.GET("/api/user/urls", tt.Storage.UserURLsHandler)
-//			//	func(c *gin.Context) {
-//			//	//c.Set("userID", tt.argsGet.userID)
-//			//	tt.Storage.UserURLsHandler(c)
-//			//})
-//			request := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
-//			w := httptest.NewRecorder()
-//			r.ServeHTTP(w, request)
-//			res := w.Result()
-//			defer res.Body.Close()
-//			assert.Equal(t, tt.argsGet.code, res.StatusCode)
-//		})
-//	}
-//}
