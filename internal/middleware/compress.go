@@ -56,13 +56,3 @@ func CompressMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-//func foundHeader(content []string) bool {
-//	for _, v := range content {
-//		if strings.Contains(v, "gzip") {
-//			return true
-//		}
-//	}
-//
-//	return false
-//}
